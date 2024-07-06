@@ -1,0 +1,32 @@
+# Clock signal
+NET "clk" LOC = "P1"; # Adjust the pin location according to your design
+NET "clk" TNM_NET = "clk_group"; # Create a timing group for the clock
+
+# I/O request signal
+NET "ioreq" LOC = "P2"; # Adjust the pin location according to your design
+
+# Read signal
+NET "rd" LOC = "P3"; # Adjust the pin location according to your design
+
+# Address bus (8-bit)
+NET "address[0]" LOC = "P4"; # Adjust the pin location according to your design
+NET "address[1]" LOC = "P5"; # Adjust the pin location according to your design
+NET "address[2]" LOC = "P6"; # Adjust the pin location according to your design
+NET "address[3]" LOC = "P7"; # Adjust the pin location according to your design
+NET "address[4]" LOC = "P8"; # Adjust the pin location according to your design
+NET "address[5]" LOC = "P9"; # Adjust the pin location according to your design
+NET "address[6]" LOC = "P10"; # Adjust the pin location according to your design
+NET "address[7]" LOC = "P11"; # Adjust the pin location according to your design
+
+# Data bus (8-bit)
+NET "data[0]" LOC = "P12"; # Adjust the pin location according to your design
+NET "data[1]" LOC = "P13"; # Adjust the pin location according to your design
+NET "data[2]" LOC = "P14"; # Adjust the pin location according to your design
+NET "data[3]" LOC = "P15"; # Adjust the pin location according to your design
+NET "data[4]" LOC = "P16"; # Adjust the pin location according to your design
+NET "data[5]" LOC = "P17"; # Adjust the pin location according to your design
+NET "data[6]" LOC = "P18"; # Adjust the pin location according to your design
+NET "data[7]" LOC = "P19"; # Adjust the pin location according to your design
+
+# Clock frequency constraint
+TIMESPEC "TS_clk" = PERIOD "clk_group" 408.16 ns HIGH 50%; # 2.45 MHz clock period (1 / 2.45 MHz = 408.16 ns)
