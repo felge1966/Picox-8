@@ -6,8 +6,8 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity PicoX8 is
   Port (
     clk       : in  std_logic;                   -- System clock
-    ioreq     : in  std_logic;                   -- I/O request signal
-    rd        : in  std_logic;                   -- Read signal
+    ioreq_n   : in  std_logic;                   -- I/O request signal
+    rd_n      : in  std_logic;                   -- Read signal
     address   : in  std_logic_vector(7 downto 0);-- Address bus (8-bit for I/O)
     data      : inout std_logic_vector(7 downto 0) -- Data bus (8-bit)
     );
@@ -22,7 +22,7 @@ begin
   process(clk)
   begin
     if rising_edge(clk) then
-      if (ioreq = '0') and (rd = '0') and (address = IO_ADDRESS) then
+      if (ioreq_n = '0') and (rd_n = '0') and (address = IO_ADDRESS) then
         data_out <= SERIAL_STATUS;
         oe <= '1';
       else

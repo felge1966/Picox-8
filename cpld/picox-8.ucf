@@ -1,28 +1,29 @@
 # Clock signal
 NET "clk" LOC = "1" | PERIOD = 408.16 ns HIGH 50%;
 
-# I/O request signal
-NET "ioreq" LOC = "2";
-
-# Read signal
-NET "rd" LOC = "3";
-
 # Address bus (8-bit)
-NET "address[0]" LOC = "5";
-NET "address[1]" LOC = "6";
-NET "address[2]" LOC = "7";
-NET "address[3]" LOC = "8";
-NET "address[4]" LOC = "12";
-NET "address[5]" LOC = "13";
-NET "address[6]" LOC = "14";
-NET "address[7]" LOC = "16";
+NET "address[0]" LOC = "2";
+NET "address[1]" LOC = "3";
+NET "address[2]" LOC = "5";
+NET "address[3]" LOC = "6";
+NET "address[4]" LOC = "7";
+NET "address[5]" LOC = "8";
+NET "address[6]" LOC = "12";
+NET "address[7]" LOC = "13";
 
 # Data bus (8-bit)
-NET "data[0]" LOC = "18";
-NET "data[1]" LOC = "19";
-NET "data[2]" LOC = "20";
-NET "data[3]" LOC = "21";
-NET "data[4]" LOC = "22";
-NET "data[5]" LOC = "23";
-NET "data[6]" LOC = "27";
-NET "data[7]" LOC = "28";
+NET "data[0]" LOC = "14";
+NET "data[1]" LOC = "16";
+NET "data[2]" LOC = "18";
+NET "data[3]" LOC = "19";
+NET "data[4]" LOC = "20";
+NET "data[5]" LOC = "21";
+NET "data[6]" LOC = "22";
+NET "data[7]" LOC = "23";
+
+NET "ioreq_n" LOC = "27";
+#NET "mreq_n" LOC = "28";
+NET "rd_n" LOC = "29";
+#NET "wr_n" LOC = "30";
+#NET "reset_n" LOC = "31";
+#NET "m1" LOC = "32";
