@@ -27,3 +27,8 @@ NET "rd_n" LOC = "29";
 #NET "wr_n" LOC = "30";
 #NET "reset_n" LOC = "31";
 #NET "m1" LOC = "32";
+
+NET "rx" LOC = "41";
+NET "rx_n" LOC = "42";
+NET "led0" LOC = "43";
+NET "led1" LOC = "44";
