@@ -12,6 +12,7 @@ entity PicoX8 is
     clk       : in    std_logic;                     -- System clock
     ioreq_n   : in    std_logic;                     -- I/O request signal
     rd_n      : in    std_logic;                     -- Read signal
+    wr_n      : in    std_logic;                     -- Write signal
     address   : in    std_logic_vector(7 downto 0);  -- Address bus (8-bit for I/O)
     data      : inout std_logic_vector(7 downto 0);  -- Data bus (8-bit)
     -- Tone dialer control bits
@@ -46,10 +47,10 @@ begin
         oe <= '1';
       elsif (wr_n = '0') and (address = ADDR_TONE_DIALER) then
         f0 <= data(0);
-        f1 <= data(0);
-        f2 <= data(0);
-        f3 <= data(0);
-        tone <= data(3);
+        f1 <= data(1);
+        f2 <= data(2);
+        f3 <= data(3);
+        tone <= data(4);
         oe <= '0';
       elsif (wr_n = '0') and (address = ADDR_MODEM_CONTROL) then
         ohc <= data(0);
