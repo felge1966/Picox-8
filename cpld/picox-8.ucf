@@ -48,3 +48,9 @@ NET "pico_stb"            LOC = "23";
 # RX inverter
 NET "rx"                  LOC = "20";
 NET "rx_n"                LOC = "74";
+
+# Debugging LEDs
+NET "led0"                LOC = "24";
+NET "led1"                LOC = "25";
+NET "led2"                LOC = "28";
+NET "led3"                LOC = "29";

@@ -36,7 +36,13 @@ entity PicoX8 is
     pico_data           : inout std_logic_vector(7 downto 0);
     pico_addr           : in    std_logic_vector(2 downto 0);
     pico_dir            : in    std_logic;
-    pico_stb            : in    std_logic
+    pico_stb            : in    std_logic;
+
+    -- LEDs for debugging
+    led0                : out   std_logic;
+    led1                : out   std_logic;
+    led2                : out   std_logic;
+    led3                : out   std_logic
     );
 end PicoX8;
 
@@ -78,6 +84,10 @@ begin
         irq_modem_control   <= '0';
         irq_ramdisk_command <= '0';
       else
+        led1                <= '1';
+        led2                <= '1';
+        led3                <= '1';
+
         -- Handle access from the Z80 side
         if (ioreq_n = '0') then
           oe <= '0';
@@ -85,11 +95,13 @@ begin
             oe <= '1';
             case address is
               when PX8_MODEM_STATUS =>
+                led1 <= '0';
                 data_out <= modem_status;
               when PX8_RAMDISK_DATA =>
                 data_out <= ramdisk_data;
                 ramdisk_ibf <= '0';
               when PX8_RAMDISK_CONTROL =>
+                led2 <= '0';
                 data_out <= (0 => ramdisk_ibf, 1 => ramdisk_obf, others => '0');
               when others =>
                 data_out <= x"00";
@@ -140,6 +152,7 @@ begin
           else
             case pico_addr is
               when PICO_MODEM_STATUS =>
+                led3 <= '0';
                 modem_status <= pico_data;
               when PICO_RAMDISK_DATA =>
                 ramdisk_data <= pico_data;
@@ -161,6 +174,8 @@ begin
 
   -- RAM-Disk handshake signals
   irq_ramdisk_obf <= ramdisk_obf;
+
+  led0 <= '0';
 
 end Behavioral;
 
