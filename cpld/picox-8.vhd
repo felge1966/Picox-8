@@ -76,9 +76,9 @@ begin
             data_out <= modem_status;
           elsif (address = ADDR_RAMDISK_DATA) then
             data_out <= ramdisk_data;
-            ramdisk_ibf = '0';
+            ramdisk_ibf <= '0';
           elsif (address = ADDR_RAMDISK_CONTROL) then
-            data_out <= (0 <= ramdisk_ibf, 1 <= ramdisk_obf, others <= '0');
+            data_out <= (0 => ramdisk_ibf, 1 => ramdisk_obf, others => '0');
           else
             data_out <= x"00";
           end if;
