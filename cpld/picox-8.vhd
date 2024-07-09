@@ -14,7 +14,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity PicoX8 is
   Port (
-    -- PX80 expansion bus
+    -- PX-8 expansion bus
     clk                 : in    std_logic;
     ioreq_n             : in    std_logic;
     rd_n                : in    std_logic;
@@ -41,11 +41,11 @@ entity PicoX8 is
 end PicoX8;
 
 architecture Behavioral of PicoX8 is
-  constant PX80_TONE_DIALER     : std_logic_vector(7 downto 0) := x"84";
-  constant PX80_MODEM_CONTROL   : std_logic_vector(7 downto 0) := x"85";
-  constant PX80_MODEM_STATUS    : std_logic_vector(7 downto 0) := x"86";
-  constant PX80_RAMDISK_DATA    : std_logic_vector(7 downto 0) := x"80";
-  constant PX80_RAMDISK_CONTROL : std_logic_vector(7 downto 0) := x"81";
+  constant PX8_TONE_DIALER      : std_logic_vector(7 downto 0) := x"84";
+  constant PX8_MODEM_CONTROL    : std_logic_vector(7 downto 0) := x"85";
+  constant PX8_MODEM_STATUS     : std_logic_vector(7 downto 0) := x"86";
+  constant PX8_RAMDISK_DATA     : std_logic_vector(7 downto 0) := x"80";
+  constant PX8_RAMDISK_CONTROL  : std_logic_vector(7 downto 0) := x"81";
   constant PICO_TONE_DIALER     : std_logic_vector(2 downto 0) := "000";
   constant PICO_MODEM_CONTROL   : std_logic_vector(2 downto 0) := "001";
   constant PICO_MODEM_STATUS    : std_logic_vector(2 downto 0) := "010";
@@ -84,28 +84,28 @@ begin
           if (rd_n = '0') then
             oe <= '1';
             case address is
-              when PX80_MODEM_STATUS =>
+              when PX8_MODEM_STATUS =>
                 data_out <= modem_status;
-              when PX80_RAMDISK_DATA =>
+              when PX8_RAMDISK_DATA =>
                 data_out <= ramdisk_data;
                 ramdisk_ibf <= '0';
-              when PX80_RAMDISK_CONTROL =>
+              when PX8_RAMDISK_CONTROL =>
                 data_out <= (0 => ramdisk_ibf, 1 => ramdisk_obf, others => '0');
               when others =>
                 data_out <= x"00";
             end case;
           elsif (wr_n = '0') then
             case address is
-              when PX80_TONE_DIALER =>
+              when PX8_TONE_DIALER =>
                 modem_tone_dialer <= data;
                 irq_tone_dialer <= '1';
-              when PX80_MODEM_CONTROL =>
+              when PX8_MODEM_CONTROL =>
                 modem_control <= data;
                 irq_modem_control <= '1';
-              when PX80_RAMDISK_DATA =>
+              when PX8_RAMDISK_DATA =>
                 ramdisk_data <= data;
                 ramdisk_obf <= '1';
-              when PX80_RAMDISK_CONTROL =>
+              when PX8_RAMDISK_CONTROL =>
                 ramdisk_command <= data;
                 irq_ramdisk_command <= '1';
               when others =>
