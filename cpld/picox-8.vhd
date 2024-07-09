@@ -41,27 +41,27 @@ entity PicoX8 is
 end PicoX8;
 
 architecture Behavioral of PicoX8 is
-  constant ADDR_TONE_DIALER      : std_logic_vector(7 downto 0) := x"84";
-  constant ADDR_MODEM_CONTROL    : std_logic_vector(7 downto 0) := x"85";
-  constant ADDR_MODEM_STATUS     : std_logic_vector(7 downto 0) := x"86";
-  constant ADDR_RAMDISK_DATA     : std_logic_vector(7 downto 0) := x"80";
-  constant ADDR_RAMDISK_CONTROL  : std_logic_vector(7 downto 0) := x"81";
-  constant INDEX_TONE_DIALER     : std_logic_vector(2 downto 0) := "000";
-  constant INDEX_MODEM_CONTROL   : std_logic_vector(2 downto 0) := "001";
-  constant INDEX_MODEM_STATUS    : std_logic_vector(2 downto 0) := "010";
-  constant INDEX_RAMDISK_DATA    : std_logic_vector(2 downto 0) := "011";
-  constant INDEX_RAMDISK_CONTROL : std_logic_vector(2 downto 0) := "100";
-  signal modem_tone_dialer       : std_logic_vector(7 downto 0);
-  signal modem_control           : std_logic_vector(7 downto 0);
-  signal modem_status            : std_logic_vector(7 downto 0);
-  signal ramdisk_data            : std_logic_vector(7 downto 0);
-  signal ramdisk_command         : std_logic_vector(7 downto 0);
-  signal ramdisk_ibf             : std_logic;
-  signal ramdisk_obf             : std_logic;
-  signal data_out                : std_logic_vector(7 downto 0);
-  signal oe                      : std_logic;
-  signal pico_data_out           : std_logic_vector(7 downto 0);
-  signal pico_oe                 : std_logic;
+  constant PX80_TONE_DIALER     : std_logic_vector(7 downto 0) := x"84";
+  constant PX80_MODEM_CONTROL   : std_logic_vector(7 downto 0) := x"85";
+  constant PX80_MODEM_STATUS    : std_logic_vector(7 downto 0) := x"86";
+  constant PX80_RAMDISK_DATA    : std_logic_vector(7 downto 0) := x"80";
+  constant PX80_RAMDISK_CONTROL : std_logic_vector(7 downto 0) := x"81";
+  constant PICO_TONE_DIALER     : std_logic_vector(2 downto 0) := "000";
+  constant PICO_MODEM_CONTROL   : std_logic_vector(2 downto 0) := "001";
+  constant PICO_MODEM_STATUS    : std_logic_vector(2 downto 0) := "010";
+  constant PICO_RAMDISK_DATA    : std_logic_vector(2 downto 0) := "011";
+  constant PICO_RAMDISK_CONTROL : std_logic_vector(2 downto 0) := "100";
+  signal modem_tone_dialer      : std_logic_vector(7 downto 0);
+  signal modem_control          : std_logic_vector(7 downto 0);
+  signal modem_status           : std_logic_vector(7 downto 0);
+  signal ramdisk_data           : std_logic_vector(7 downto 0);
+  signal ramdisk_command        : std_logic_vector(7 downto 0);
+  signal ramdisk_ibf            : std_logic;
+  signal ramdisk_obf            : std_logic;
+  signal data_out               : std_logic_vector(7 downto 0);
+  signal oe                     : std_logic;
+  signal pico_data_out          : std_logic_vector(7 downto 0);
+  signal pico_oe                : std_logic;
 begin
   process(clk)
   begin
@@ -84,28 +84,28 @@ begin
           if (rd_n = '0') then
             oe <= '1';
             case address is
-              when ADDR_MODEM_STATUS =>
+              when PX80_MODEM_STATUS =>
                 data_out <= modem_status;
-              when ADDR_RAMDISK_DATA =>
+              when PX80_RAMDISK_DATA =>
                 data_out <= ramdisk_data;
                 ramdisk_ibf <= '0';
-              when ADDR_RAMDISK_CONTROL =>
+              when PX80_RAMDISK_CONTROL =>
                 data_out <= (0 => ramdisk_ibf, 1 => ramdisk_obf, others => '0');
               when others =>
                 data_out <= x"00";
             end case;
           elsif (wr_n = '0') then
             case address is
-              when ADDR_TONE_DIALER =>
+              when PX80_TONE_DIALER =>
                 modem_tone_dialer <= data;
                 irq_tone_dialer <= '1';
-              when ADDR_MODEM_CONTROL =>
+              when PX80_MODEM_CONTROL =>
                 modem_control <= data;
                 irq_modem_control <= '1';
-              when ADDR_RAMDISK_DATA =>
+              when PX80_RAMDISK_DATA =>
                 ramdisk_data <= data;
                 ramdisk_obf <= '1';
-              when ADDR_RAMDISK_CONTROL =>
+              when PX80_RAMDISK_CONTROL =>
                 ramdisk_command <= data;
                 irq_ramdisk_command <= '1';
               when others =>
@@ -120,27 +120,28 @@ begin
           if (pico_dir = '0') then
             pico_oe <= '1';
             case pico_addr is
-              when INDEX_TONE_DIALER =>
+              when PICO_TONE_DIALER =>
                 pico_data_out <= modem_tone_dialer;
                 irq_tone_dialer <= '0';
-              when INDEX_MODEM_CONTROL =>
+              when PICO_MODEM_CONTROL =>
                 pico_data_out <= modem_control;
                 irq_modem_control <= '0';
-              when INDEX_RAMDISK_DATA =>
+              when PICO_RAMDISK_DATA =>
                 pico_data_out <= ramdisk_data;
                 ramdisk_obf <= '0';
-              when INDEX_RAMDISK_CONTROL =>
+              when PICO_RAMDISK_CONTROL =>
                 pico_data_out <= ramdisk_command;
                 irq_ramdisk_command <= '0';
-                ramdisk_obf <= '0';             -- flush output buffer
+                ramdisk_ibf <= '0';             -- flush buffers
+                ramdisk_obf <= '0';
               when others =>
                 pico_data_out <= x"00";
             end case;
           else
             case pico_addr is
-              when INDEX_MODEM_STATUS =>
+              when PICO_MODEM_STATUS =>
                 modem_status <= pico_data;
-              when INDEX_RAMDISK_CONTROL =>
+              when PICO_RAMDISK_DATA =>
                 ramdisk_data <= pico_data;
                 ramdisk_ibf <= '1';
               when others =>
