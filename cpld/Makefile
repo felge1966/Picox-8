@@ -1,5 +1,5 @@
 project_name ?= picox-8
-target ?= xc9572xl-10-VQ44
+target ?= xc95144xl-10-TQ100
 
 
 # alternative speed, density

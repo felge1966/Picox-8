@@ -6,28 +6,24 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity PicoX8 is
   Port (
     -- Serial port receiver (needs inverter)
-    rx_n      : out   std_logic;
-    rx        : in    std_logic;
+    rx_n             : out   std_logic;
+    rx               : in    std_logic;
     -- PX80 Z80 System Bus
-    clk       : in    std_logic;                     -- System clock
-    ioreq_n   : in    std_logic;                     -- I/O request signal
-    rd_n      : in    std_logic;                     -- Read signal
-    wr_n      : in    std_logic;                     -- Write signal
-    address   : in    std_logic_vector(7 downto 0);  -- Address bus (8-bit for I/O)
-    data      : inout std_logic_vector(7 downto 0);  -- Data bus (8-bit)
-    -- Tone dialer control bits
-    f0        : out std_logic;
-    f1        : out std_logic;
-    f2        : out std_logic;
-    f3        : out std_logic;
-    tone      : out std_logic;
-    -- Modem control bits
-    ohc       : out std_logic;
-    mon       : out std_logic;
-    txc       : out std_logic;
-    ans       : out std_logic;
-    pwr       : out std_logic;
-    cct       : out std_logic
+    clk              : in    std_logic;                     -- System clock
+    ioreq_n          : in    std_logic;                     -- I/O request signal
+    rd_n             : in    std_logic;                     -- Read signal
+    wr_n             : in    std_logic;                     -- Write signal
+    address          : in    std_logic_vector(7 downto 0);  -- Address bus (8-bit for I/O)
+    data             : inout std_logic_vector(7 downto 0);  -- Data bus (8-bit)
+    -- IRQ signals
+    irq_tone_dialer  : out   std_logic;
+    irq_modem_status : out   std_logic;
+    irq_ramdisk_ctl  : out   std_logic;
+    irq_ramdisk_data : out   std_logic;
+    -- Pico register access port
+    pico_data        : inout std_logic_vector(7 downto 0);
+    pico_dir         : in    std_logic;
+    pico_stb         : in    std_logic
     );
 end PicoX8;
 
@@ -45,21 +41,6 @@ begin
       if (rd_n = '0') and (address = ADDR_MODEM_STATUS) then
         data_out <= SERIAL_STATUS;
         oe <= '1';
-      elsif (wr_n = '0') and (address = ADDR_TONE_DIALER) then
-        f0 <= data(0);
-        f1 <= data(1);
-        f2 <= data(2);
-        f3 <= data(3);
-        tone <= data(4);
-        oe <= '0';
-      elsif (wr_n = '0') and (address = ADDR_MODEM_CONTROL) then
-        ohc <= data(0);
-        mon <= data(2);
-        txc <= data(3);
-        ans <= data(4);
-        pwr <= data(6);
-        cct <= data(7);
-        oe <= '0';
       else
         oe <= '0';
       end if;
