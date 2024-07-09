@@ -9,7 +9,8 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 -- registers using an 8 bit wide, bidirectional interface with a 3 bit address
 -- bus, a direction signal ('0' => read, '1' => write) and a strobe signal.
 -- Transfers from and to the Pico need to be synchronized to the Z80 clock
--- signal, with the RP2040 making changes only near the falling edge.
+-- signal, with the RP2040 making changes only near the rising edge and
+-- sampling near the falling edge.
 
 entity PicoX8 is
   Port (
@@ -45,7 +46,6 @@ architecture Behavioral of PicoX8 is
   constant ADDR_MODEM_STATUS    : std_logic_vector(7 downto 0) := x"86"; -- 2
   constant ADDR_RAMDISK_DATA    : std_logic_vector(7 downto 0) := x"80"; -- 3
   constant ADDR_RAMDISK_CONTROL : std_logic_vector(7 downto 0) := x"81"; -- 4
-  signal data_out               : std_logic_vector(7 downto 0);
   signal modem_tone_dialer      : std_logic_vector(7 downto 0);
   signal modem_control          : std_logic_vector(7 downto 0);
   signal modem_status           : std_logic_vector(7 downto 0);
@@ -53,7 +53,10 @@ architecture Behavioral of PicoX8 is
   signal ramdisk_command        : std_logic_vector(7 downto 0);
   signal ramdisk_ibf            : std_logic;
   signal ramdisk_obf            : std_logic;
+  signal data_out               : std_logic_vector(7 downto 0);
   signal oe                     : std_logic;
+  signal pico_data_out          : std_logic_vector(7 downto 0);
+  signal pico_oe                : std_logic;
 begin
   process(clk)
   begin
@@ -69,74 +72,75 @@ begin
         irq_tone_dialer     <= '0';
         irq_modem_control   <= '0';
         irq_ramdisk_command <= '0';
-      elsif (ioreq_n = '0') then
-        if (rd_n = '0') then
-          oe <= '1';
-          if (address = ADDR_MODEM_STATUS) then
-            data_out <= modem_status;
-          elsif (address = ADDR_RAMDISK_DATA) then
-            data_out <= ramdisk_data;
-            ramdisk_ibf <= '0';
-          elsif (address = ADDR_RAMDISK_CONTROL) then
-            data_out <= (0 => ramdisk_ibf, 1 => ramdisk_obf, others => '0');
-          else
-            data_out <= x"00";
-          end if;
-        elsif (wr_n = '0') then
+      else
+        if (ioreq_n = '0') then
           oe <= '0';
-          if (address = ADDR_TONE_DIALER) then
-            modem_tone_dialer <= data;
-            irq_tone_dialer <= '1';
-          elsif (address = ADDR_MODEM_CONTROL) then
-            modem_control <= data;
-            irq_modem_control <= '1';
-          elsif (address = ADDR_RAMDISK_DATA) then
-            ramdisk_data <= data;
-            ramdisk_obf <= '1';
-          elsif (address = ADDR_RAMDISK_CONTROL) then
-            ramdisk_command <= data;
-            irq_ramdisk_command <= '1';
+          if (rd_n = '0') then
+            oe <= '1';
+            if (address = ADDR_MODEM_STATUS) then
+              data_out <= modem_status;
+            elsif (address = ADDR_RAMDISK_DATA) then
+              data_out <= ramdisk_data;
+              ramdisk_ibf <= '0';
+            elsif (address = ADDR_RAMDISK_CONTROL) then
+              data_out <= (0 => ramdisk_ibf, 1 => ramdisk_obf, others => '0');
+            else
+              data_out <= x"00";
+            end if;
+          elsif (wr_n = '0') then
+            if (address = ADDR_TONE_DIALER) then
+              modem_tone_dialer <= data;
+              irq_tone_dialer <= '1';
+            elsif (address = ADDR_MODEM_CONTROL) then
+              modem_control <= data;
+              irq_modem_control <= '1';
+            elsif (address = ADDR_RAMDISK_DATA) then
+              ramdisk_data <= data;
+              ramdisk_obf <= '1';
+            elsif (address = ADDR_RAMDISK_CONTROL) then
+              ramdisk_command <= data;
+              irq_ramdisk_command <= '1';
+            end if;
           end if;
-        else
-          oe <= '0';
+        end if;
+
+        if (pico_stb = '1') then
+          pico_oe <= '0';
+
+          if pico_dir = '0' and pico_addr = x"0" then
+            pico_data_out <= modem_tone_dialer;
+            pico_oe <= '1';
+            irq_tone_dialer <= '0';
+
+          elsif pico_dir = '0' and pico_addr = x"1" then
+            pico_data_out <= modem_control;
+            pico_oe <= '1';
+            irq_modem_control <= '0';
+
+          elsif pico_dir = '1' and pico_addr = x"2" then
+            modem_status <= pico_data;
+
+          elsif pico_dir = '0' and pico_addr = x"3" then
+            pico_data_out <= ramdisk_data;
+            pico_oe <= '1';
+            ramdisk_obf <= '0';
+          elsif pico_dir = '1' and pico_addr = x"3" then
+            ramdisk_data <= pico_data;
+            ramdisk_ibf <= '1';
+
+          elsif pico_dir = '0' and pico_addr = x"4" then
+            pico_data_out <= ramdisk_command;
+            pico_oe <= '1';
+            irq_ramdisk_command <= '0';
+            ramdisk_obf <= '0';             -- flush output buffer
+          end if;
         end if;
       end if;
     end if;
   end process;
 
-  process(clk)
-  begin
-    if rising_edge(clk) and (pico_stb = '1') then
-
-      if pico_dir = '0' and pico_addr = x"0" then
-        pico_data           <= modem_tone_dialer;
-        irq_tone_dialer     <= '0';
-
-      elsif pico_dir = '0' and pico_addr = x"1" then
-        pico_data           <= modem_control;
-        irq_modem_control   <= '0';
-
-      elsif pico_dir = '1' and pico_addr = x"2" then
-        modem_status        <= pico_data;
-
-      elsif pico_dir = '0' and pico_addr = x"3" then
-        pico_data           <= ramdisk_data;
-        ramdisk_obf         <= '0';
-      elsif pico_dir = '1' and pico_addr = x"3" then
-        ramdisk_data        <= pico_data;
-        ramdisk_ibf         <= '1';
-
-      elsif pico_dir = '0' and pico_addr = x"4" then
-        pico_data           <= ramdisk_command;
-        irq_ramdisk_command <= '0';
-        ramdisk_obf         <= '0';             -- flush output buffer
-      else
-        pico_data           <= (others => 'Z');
-      end if;
-    end if;
-  end process;
-
   data <= data_out when oe = '1' else (others => 'Z');
+  pico_data <= pico_data_out when pico_oe = '1' else (others => 'Z');
 
   -- RS232 RX on expansion bus needs to be inverted
   rx_n <= not rx;

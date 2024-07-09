@@ -1,50 +1,50 @@
 # Clock signal
 
 # Address bus (8-bit)
-NET "address[0]"       LOC = "97";
-NET "address[1]"       LOC = "96";
-NET "address[2]"       LOC = "95";
-NET "address[3]"       LOC = "94";
-NET "address[4]"       LOC = "93";
-NET "address[5]"       LOC = "92";
-NET "address[6]"       LOC = "91";
-NET "address[7]"       LOC = "90";
+NET "address[0]"          LOC = "97";
+NET "address[1]"          LOC = "96";
+NET "address[2]"          LOC = "95";
+NET "address[3]"          LOC = "94";
+NET "address[4]"          LOC = "93";
+NET "address[5]"          LOC = "92";
+NET "address[6]"          LOC = "91";
+NET "address[7]"          LOC = "90";
 
 # Data bus (8-bit)
-NET "data[0]"          LOC = "89";
-NET "data[1]"          LOC = "87";
-NET "data[2]"          LOC = "86";
-NET "data[3]"          LOC = "85";
-NET "data[4]"          LOC = "82";
-NET "data[5]"          LOC = "81";
-NET "data[6]"          LOC = "80";
-NET "data[7]"          LOC = "79";
+NET "data[0]"             LOC = "89";
+NET "data[1]"             LOC = "87";
+NET "data[2]"             LOC = "86";
+NET "data[3]"             LOC = "85";
+NET "data[4]"             LOC = "82";
+NET "data[5]"             LOC = "81";
+NET "data[6]"             LOC = "80";
+NET "data[7]"             LOC = "79";
 
 # Z80 Control
-NET "clk"              LOC = "22" | PERIOD = 408.16 ns HIGH 50%;
-NET "ioreq_n"          LOC = "78";
-NET "rd_n"             LOC = "77";
-NET "wr_n"             LOC = "76";
+NET "clk"                 LOC = "22" | PERIOD = 408.16 ns HIGH 50%;
+NET "ioreq_n"             LOC = "78";
+NET "rd_n"                LOC = "77";
+NET "wr_n"                LOC = "76";
 
 # Register full signals to Pico
-NET "irq_tone_dialer"  LOC = "6";
-NET "irq_modem_status" LOC = "7";
-NET "irq_ramdisk_ctl"  LOC = "8";
-NET "irq_ramdisk_data" LOC = "9";
+NET "irq_tone_dialer"     LOC = "6";
+NET "irq_modem_control"   LOC = "7";
+NET "irq_ramdisk_command" LOC = "8";
+NET "irq_ramdisk_obf"     LOC = "9";
 
 # Pico register access port
-NET "pico_data[0]"     LOC = "10";
-NET "pico_data[1]"     LOC = "11";
-NET "pico_data[2]"     LOC = "12";
-NET "pico_data[3]"     LOC = "13";
-NET "pico_data[4]"     LOC = "14";
-NET "pico_data[5]"     LOC = "15";
-NET "pico_data[6]"     LOC = "16";
-NET "pico_data[7]"     LOC = "17";
+NET "pico_data[0]"        LOC = "10";
+NET "pico_data[1]"        LOC = "11";
+NET "pico_data[2]"        LOC = "12";
+NET "pico_data[3]"        LOC = "13";
+NET "pico_data[4]"        LOC = "14";
+NET "pico_data[5]"        LOC = "15";
+NET "pico_data[6]"        LOC = "16";
+NET "pico_data[7]"        LOC = "17";
 
-NET "pico_dir"         LOC = "18";
-NET "pico_stb"         LOC = "23";
+NET "pico_dir"            LOC = "18";
+NET "pico_stb"            LOC = "23";
 
 # RX inverter
-NET "rx"               LOC = "20";
-NET "rx_n"             LOC = "74";
+NET "rx"                  LOC = "20";
+NET "rx_n"                LOC = "74";
