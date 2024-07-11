@@ -21,29 +21,34 @@ NET "data[6]"             LOC = "80";
 NET "data[7]"             LOC = "79";
 
 # Z80 Control
-NET "clk"                 LOC = "22" | PERIOD = 408.16 ns HIGH 50%;
+NET "clk"                 LOC = "22" | PERIOD = 408.16 ns HIGH 50%;  # Pico GP10
 NET "ioreq_n"             LOC = "78";
 NET "rd_n"                LOC = "77";
 NET "wr_n"                LOC = "76";
-
-# Register full signals to Pico
-NET "irq_tone_dialer"     LOC = "6";
-NET "irq_modem_control"   LOC = "7";
-NET "irq_ramdisk_command" LOC = "8";
-NET "irq_ramdisk_obf"     LOC = "9";
+NET "reset_n"             LOC = "73";
 
 # Pico register access port
-NET "pico_data[0]"        LOC = "10";
-NET "pico_data[1]"        LOC = "11";
-NET "pico_data[2]"        LOC = "12";
-NET "pico_data[3]"        LOC = "13";
-NET "pico_data[4]"        LOC = "14";
-NET "pico_data[5]"        LOC = "15";
-NET "pico_data[6]"        LOC = "16";
-NET "pico_data[7]"        LOC = "17";
+NET "pico_data[0]"        LOC = "10"; # Pico GP2
+NET "pico_data[1]"        LOC = "11"; # Pico GP3
+NET "pico_data[2]"        LOC = "12"; # Pico GP4
+NET "pico_data[3]"        LOC = "13"; # Pico GP5
+NET "pico_data[4]"        LOC = "14"; # Pico GP6
+NET "pico_data[5]"        LOC = "15"; # Pico GP7
+NET "pico_data[6]"        LOC = "16"; # Pico GP8
+NET "pico_data[7]"        LOC = "17"; # Pico GP9
 
-NET "pico_dir"            LOC = "18";
-NET "pico_stb"            LOC = "23";
+NET "pico_dir"            LOC = "18"; # Pico GP11
+NET "pico_stb"            LOC = "23"; # Pico GP12
+
+NET "pico_addr[0]"        LOC = "30"; # Pico GP13
+NET "pico_addr[1]"        LOC = "32"; # Pico GP14
+NET "pico_addr[2]"        LOC = "33"; # Pico GP15
+
+# Register full signals to Pico
+NET "irq_tone_dialer"     LOC = "6"; # Pico GP16
+NET "irq_modem_control"   LOC = "7"; # Pico GP17
+NET "irq_ramdisk_command" LOC = "8"; # Pico GP18
+NET "irq_ramdisk_obf"     LOC = "9"; # Pico GP19
 
 # RX inverter
 NET "rx"                  LOC = "20";
