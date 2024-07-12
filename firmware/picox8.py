@@ -7,60 +7,73 @@ PIN_DIR = Pin(11, Pin.OUT)
 PIN_STB = Pin(12, Pin.OUT)
 PIN_ADDR = [Pin(i, Pin.OUT) for i in range(13, 16)]
 
+ADDR_BITS_POS = 11 # relative to pin 2
+
+# Bit mask for 32 bit FIFO data.  The upper half defines the direction
+# bits, the lower half defines the data bits.  DIR, STB and the ADDR
+# bits are always configured as outputs.  When writing, the data bits
+# are also configured as outputs, and the DIR bit is set to one.
+STB_MASK   = 0b00111110_00000000_00000101_00000000
+WRITE_MASK = 0b00000000_11111111_00000010_00000000
+
 # IRQ pins
 PIN_IRQ_TONE_DIALER = Pin(16, Pin.IN, Pin.PULL_UP)
 PIN_IRQ_MODEM_STATUS = Pin(17, Pin.IN, Pin.PULL_UP)
 PIN_IRQ_RAMDISK_COMMAND = Pin(18, Pin.IN, Pin.PULL_UP)
 PIN_IRQ_RAMDISK_OBF = Pin(19, Pin.IN, Pin.PULL_UP)
 
-def wait_for_rising_edge(pin):
-    while pin.value() != 0:
-        pass
-    while pin.value() != 1:
-        pass
+from machine import Pin
+import rp2
 
-def wait_for_falling_edge(pin):
-    while pin.value() != 1:
-        pass
-    while pin.value() != 0:
-        pass
-  
+# Define the PIO program
+@rp2.asm_pio(
+    out_init=(rp2.PIO.OUT_LOW,) * 15,
+    in_init=(rp2.PIO.IN_LOW,) * 8,
+    autopull=False
+)
+def parallel_interface():
+    # Pull 32-bit value from FIFO
+    pull(block)
 
-def set_data_direction(direction):
-    for pin in PIN_DATA:
-        pin.init(direction)
+    # Wait for rising edge on CLK (pin 10)
+    wait(0, pin, 10)
+    wait(1, pin, 10)
 
-def write_data(register, data):
-    wait_for_rising_edge(PIN_CLK)
+    # Output 15 bits to pins (DATA, CLK, DIR, STB, ADDR + extra)
+    out(pins, 16)
+    # Output 15 bits to pindirs to set pin directions
+    out(pindirs, 16)
+    
+    # Wait for falling edge on CLK (pin 10)
+    wait(0, pin, 10)
+    
+    # Read 8 bits from input pins to ISR
+    in_(pins, 8)
+    # Push ISR content to FIFO
+    push(block)
 
-    set_data_direction(Pin.OUT)
-    for i in range(3):
-        PIN_ADDR[i].value((register >> i) & 1)
-    PIN_DIR.value(1)
-    for i in range(8):
-        PIN_DATA[i].value((data >> i) & 1)
-    PIN_STB.value(1)
+    # Set all outputs to zero
+    mov(osr, null)
+    out(pins, 16)
+    # Wait for next rising CLK edge to complete cycle
+    wait(1, pin, 10)
 
-    wait_for_rising_edge(PIN_CLK)
-    PIN_STB.value(0)
-    set_data_direction(Pin.IN)
+    # Set all pindirs to zero (input)
+    out(pindirs, 16)
 
-def read_data(register):
-    for i in range(3):
-        PIN_ADDR[i].value((register >> i) & 1)
-    PIN_DIR.value(0)
-    wait_for_rising_edge(PIN_CLK)
-    PIN_STB.value(1)
+# Create and configure the state machine
+sm = rp2.StateMachine(0, parallel_interface, freq=8_000_000, in_base=Pin(2), out_base=Pin(2))
 
-    wait_for_falling_edge(PIN_CLK)
+# Initialize the state machine
+sm.active(1)
 
-    data = 0
-    for i in range(8):
-        data |= (PIN_DATA[i].value() << i)
+def write_data(address, data):
+    sm.put(data | (address << ADDR_BITS_POS) | WRITE_MASK | STB_MASK)
+    sm.get()
 
-    PIN_STB.value(0)
-
-    return data
+def read_data(address, data):
+    sm.put((address << ADDR_BITS_POS) | STB_MASK)
+    return sm.get()
 
 # Functions to read IRQ pin statuses
 def read_irq_tone_dialer():
