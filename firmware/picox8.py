@@ -11,11 +11,17 @@ PIN_ADDR = [Pin(i, Pin.OUT) for i in range(13, 16)]
 
 ADDR_BITS_POS = 11 # relative to pin 2
 
-# Bit mask for 32 bit FIFO data.  The upper half defines the direction
-# bits, the lower half defines the data bits.  DIR, STB and the ADDR
-# bits are always configured as outputs.  When writing, the data bits
-# are also configured as outputs, and the DIR bit is set to one.
+# Bit mask for 32 bit command word that is sent from MicroPython to
+# the PIO state machine.  The upper half of this command word defines
+# the direction bits, the lower half defines the data bits.  DIR, STB
+# and the ADDR bits are always configured as outputs.  When writing,
+# the data bits are also configured as outputs, and the DIR bit is set
+# to one.  The MSB is an additional read/write indicator that needs to
+# be set to 1 for read operations.  It is used by the PIO state
+# machine to skip reading from the data lines into the FIFO when
+# writing.
 STB_MASK   = 0b00111110_00000000_00000100_00000000
+READ_MASK  = 0b10000000_00000000_00000000_00000000
 WRITE_MASK = 0b00000000_11111111_00000010_00000000
 
 # IRQ pins
@@ -40,16 +46,21 @@ def parallel_interface():
     # Output data bits to pins (DATA, CLK, DIR, STB, ADDR + extra)
     out(pins, 16)
     # Output pindirs bits to set pin directions
-    out(pindirs, 16)
+    out(pindirs, 15)
 
     # Wait for falling edge on CLK
     wait(0, pin, CLK_PIN)
+
+    # Skip reading for write operation
+    mov(x, osr)
+    jmp(not_x, "finish_cycle")
 
     # Read 8 bits from input pins to ISR
     in_(pins, 8)
     # Push ISR content to FIFO
     push()
 
+    label("finish_cycle")
     # Wait for next rising CLK edge to complete cycle
     wait(1, pin, CLK_PIN)
 
@@ -66,11 +77,10 @@ sm.active(1)
 # Initialize the state machine
 
 def write_data(address, data):
-    sm.put(data | (address << ADDR_BITS_POS) | STB_MASK | WRITE_MASK)
-    sm.get()
+    sm.put((address << ADDR_BITS_POS) | STB_MASK | WRITE_MASK | data)
 
 def read_data(address):
-    sm.put((address << ADDR_BITS_POS) | STB_MASK)
+    sm.put((address << ADDR_BITS_POS) | STB_MASK | READ_MASK)
     return sm.get()
 
 # Functions to read IRQ pin statuses
