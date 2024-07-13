@@ -95,19 +95,21 @@ begin
         if (ioreq_n = '0') then
           oe <= '0';
           if (rd_n = '0') then
-            oe <= '1';
             case address is
               when PX8_MODEM_STATUS =>
                 led1_buf <= '0';
                 data_out <= modem_status;
+                oe <= '1';
               when PX8_RAMDISK_DATA =>
                 data_out <= ramdisk_data;
                 ramdisk_ibf <= '0';
+                oe <= '1';
               when PX8_RAMDISK_CONTROL =>
                 led2_buf <= '0';
                 data_out <= (0 => ramdisk_ibf, 1 => ramdisk_obf, others => '0');
+                oe <= '1';
               when others =>
-                data_out <= x"00";
+                null;
             end case;
           elsif (wr_n = '0') then
             case address is
