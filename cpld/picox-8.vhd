@@ -90,10 +90,11 @@ begin
         led1_buf <= '1';
         led2_buf <= '1';
         led3_buf <= '1';
+        oe <= '0';
+        pico_oe <= '0';
 
         -- Handle access from the Z80 side
         if (ioreq_n = '0') then
-          oe <= '0';
           if (rd_n = '0') then
             case address is
               when PX8_MODEM_STATUS =>
@@ -132,8 +133,6 @@ begin
         end if;
         -- Handle access from the Pico side
         if (pico_stb = '1') then
-          pico_oe <= '0';
-
           if (pico_dir = '0') then
             pico_oe <= '1';
             case pico_addr is
