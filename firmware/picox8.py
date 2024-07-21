@@ -30,6 +30,13 @@ PIN_IRQ_MODEM_STATUS = Pin(17, Pin.IN, Pin.PULL_UP)
 PIN_IRQ_RAMDISK_COMMAND = Pin(18, Pin.IN, Pin.PULL_UP)
 PIN_IRQ_RAMDISK_OBF = Pin(19, Pin.IN, Pin.PULL_UP)
 
+# Register numbers
+REG_TONE_DIALER = 0
+REG_MODEM_CONTROL = 1
+REG_MODEM_STATUS = 2
+REG_RAMDISK_DATA = 3
+REG_RAMDISK_CONTROL = 4
+
 # Define the PIO program
 @rp2.asm_pio(out_shiftdir=PIO.SHIFT_RIGHT,
              out_init=(PIO.IN_LOW,)*8 + (PIO.IN_LOW, PIO.OUT_LOW, PIO.OUT_LOW) + (PIO.OUT_LOW,)*3,
@@ -70,34 +77,129 @@ def parallel_interface():
     # Set all pindirs to zero (input)
     out(pindirs, 16)
 
+
 # Create and configure the state machine
 sm = rp2.StateMachine(0, parallel_interface, freq=24_000_000, in_base=Pin(2), out_base=Pin(2))
 sm.active(1)
 
-# Initialize the state machine
 
+# Initialize the state machine
 def write_data(address, data):
     sm.put((address << ADDR_BITS_POS) | STB_MASK | WRITE_MASK | data)
+
 
 def read_data(address):
     sm.put((address << ADDR_BITS_POS) | STB_MASK | READ_MASK)
     return sm.get()
 
+
 # Functions to read IRQ pin statuses
 def read_irq_tone_dialer():
     return PIN_IRQ_TONE_DIALER.value()
 
+
 def read_irq_modem_status():
     return PIN_IRQ_MODEM_STATUS.value()
+
 
 def read_irq_ramdisk_command():
     return PIN_IRQ_RAMDISK_COMMAND.value()
 
+
 def read_irq_ramdisk_obf():
     return PIN_IRQ_RAMDISK_OBF.value()
 
-# Example usage
-def main():
+
+class RamDiskCommand:
+    RESET = 0
+    READ = 1
+    READB = 2
+    WRITE = 3
+    WRITEB = 4
+    CKSUM = 5
+
+    @classmethod
+    def _create_name_mapping(cls):
+        # Create a dictionary mapping values to names
+        return {value: name for name, value in cls.__dict__.items() if not name.startswith('_')}
+
+    @classmethod
+    def get_name(cls, value):
+        name_mapping = cls._create_name_mapping()
+        return name_mapping.get(value, "UNKNOWN_COMMAND")
+
+
+ramdisk_command = None
+ramdisk_read_count = None
+ramdisk_read_pointer = None
+ramdisk_buffer = bytearray(131)                             # maximum number of bytes that are exchanged with host in one command
+ramdisk_cksum = 3                                           # not formatted
+
+def handle_ramdisk_command():
+    ramdisk_command = read_data(REG_RAMDISK_CONTROL)
+    print("RAM-Disk Command: ", RamDiskCommand.get_name(ramdisk_command))
+    ramdisk_read_pointer = 0
+    ramdisk_read_count = 0
+    if ramdisk_command == RamDiskCommand.RESET:
+        ramdisk_command = None
+        write_data(REG_RAMDISK_DATA, 1)           # 1 == 120K RAM Disk
+    elif ramdisk_command == RamDiskCommand.READ:
+        ramdisk_read_count = 2
+    elif ramdisk_command == RamDiskCommand.READB:
+        ramdisk_read_count = 3
+    elif ramdisk_command == RamDiskCommand.WRITE:
+        ramdisk_formatted = 0                               # mark ramdisk as formatted
+        ramdisk_read_count = 130
+    elif ramdisk_command == RamDiskCommand.WRITEB:
+        ramdisk_read_count = 4
+    elif ramdisk_command == RamDiskCommand.CKSUM:
+        ramdisk_command = None
+        write_data(REG_RAMDISK_DATA, ramdisk_cksum)
+    else:
+        ramdisk_command = None
+
+
+
+def poll_irq_lines():
+    old_irq_tone_dialer = read_irq_tone_dialer()
+    old_irq_modem_status = read_irq_modem_status()
+    old_irq_ramdisk_command = read_irq_ramdisk_command()
+    old_irq_ramdisk_obf = read_irq_ramdisk_obf()
+
+    while True:
+        irq_tone_dialer = read_irq_tone_dialer()
+        irq_modem_status = read_irq_modem_status()
+        irq_ramdisk_command = read_irq_ramdisk_command()
+        irq_ramdisk_obf = read_irq_ramdisk_obf()
+
+        if irq_tone_dialer != old_irq_tone_dialer:
+            print("IRQ Tone Dialer:", irq_tone_dialer)
+            if irq_tone_dialer == 1:
+                print("Tone Dialer Register: ", read_data(REG_TONE_DIALER))
+            old_irq_tone_dialer = irq_tone_dialer
+        if irq_modem_status != old_irq_modem_status:
+            print("IRQ Modem Status:", irq_modem_status)
+            if irq_modem_status == 1:
+                print("Modem Status Register: ", read_data(REG_MODEM_STATUS))
+            old_irq_modem_status = irq_modem_status
+        if irq_ramdisk_command != old_irq_ramdisk_command:
+            print("IRQ Ramdisk Command:", irq_ramdisk_command)
+            if irq_ramdisk_command == 1:
+                handle_ramdisk_command()
+            old_irq_ramdisk_command = irq_ramdisk_command
+        if irq_ramdisk_obf != old_irq_ramdisk_obf:
+            print("IRQ Ramdisk OBF:", irq_ramdisk_obf)
+            if irq_ramdisk_obf == 1:
+                if ramdisk_read_count == 0:
+                    print("unexpected data from host")
+                else:
+                    ramdisk_buffer[ramdisk_pointer] = read_data(REG_RAMDISK_DATA)
+                    ramdisk_pointer = ramdisk_pointer + 1
+                    ramdisk_read_count = ramdisk_read_count - 1
+            old_irq_ramdisk_obf = irq_ramdisk_obf
+
+
+def test_read_write():
     # Read IRQ statuses
     print("IRQ Tone Dialer:", read_irq_tone_dialer())
     print("IRQ Modem Status:", read_irq_modem_status())
