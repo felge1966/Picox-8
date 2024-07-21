@@ -135,7 +135,7 @@ begin
         if (pico_stb = '1') then
           if (pico_dir = '0') then
             pico_oe <= '1';
-            case pico_addr is
+            case pico_addr is -- read
               when PICO_TONE_DIALER =>
                 pico_data_out <= modem_tone_dialer;
                 irq_tone_dialer <= '0';
@@ -154,7 +154,7 @@ begin
                 pico_data_out <= x"00";
             end case;
           else
-            case pico_addr is
+            case pico_addr is -- write
               when PICO_MODEM_STATUS =>
                 led3_buf <= '0';
                 modem_status <= pico_data;

@@ -110,54 +110,68 @@ def read_irq_ramdisk_obf():
     return PIN_IRQ_RAMDISK_OBF.value()
 
 
-class RamDiskCommand:
-    RESET = 0
-    READ = 1
-    READB = 2
-    WRITE = 3
-    WRITEB = 4
-    CKSUM = 5
+class RamDisk:
 
-    @classmethod
-    def _create_name_mapping(cls):
-        # Create a dictionary mapping values to names
-        return {value: name for name, value in cls.__dict__.items() if not name.startswith('_')}
+    class Command:
+        RESET = 0
+        READ = 1
+        READB = 2
+        WRITE = 3
+        WRITEB = 4
+        CKSUM = 5
 
-    @classmethod
-    def get_name(cls, value):
-        name_mapping = cls._create_name_mapping()
-        return name_mapping.get(value, "UNKNOWN_COMMAND")
+        @classmethod
+        def _create_name_mapping(cls):
+            # Create a dictionary mapping values to names
+            return {value: name for name, value in cls.__dict__.items() if not name.startswith('_')}
+
+        @classmethod
+        def get_name(cls, value):
+            name_mapping = cls._create_name_mapping()
+            return name_mapping.get(value, "UNKNOWN_COMMAND")
 
 
-ramdisk_command = None
-ramdisk_read_count = None
-ramdisk_read_pointer = None
-ramdisk_buffer = bytearray(131)                             # maximum number of bytes that are exchanged with host in one command
-ramdisk_cksum = 3                                           # not formatted
+    command = None
+    read_count = None
+    read_pointer = None
+    buffer = bytearray(131)                             # maximum number of bytes that are exchanged with host in one command
+    cksum = 3                                           # not formatted
 
-def handle_ramdisk_command():
-    ramdisk_command = read_data(REG_RAMDISK_CONTROL)
-    print("RAM-Disk Command: ", RamDiskCommand.get_name(ramdisk_command))
-    ramdisk_read_pointer = 0
-    ramdisk_read_count = 0
-    if ramdisk_command == RamDiskCommand.RESET:
-        ramdisk_command = None
-        write_data(REG_RAMDISK_DATA, 1)           # 1 == 120K RAM Disk
-    elif ramdisk_command == RamDiskCommand.READ:
-        ramdisk_read_count = 2
-    elif ramdisk_command == RamDiskCommand.READB:
-        ramdisk_read_count = 3
-    elif ramdisk_command == RamDiskCommand.WRITE:
-        ramdisk_formatted = 0                               # mark ramdisk as formatted
-        ramdisk_read_count = 130
-    elif ramdisk_command == RamDiskCommand.WRITEB:
-        ramdisk_read_count = 4
-    elif ramdisk_command == RamDiskCommand.CKSUM:
-        ramdisk_command = None
-        write_data(REG_RAMDISK_DATA, ramdisk_cksum)
-    else:
-        ramdisk_command = None
+    def handle_command(self):
+        Command = RamDisk.Command
+        self.command = read_data(REG_RAMDISK_CONTROL)
+        print("RAM-Disk Command: ", Command.get_name(self.command))
+        self.read_pointer = 0
+        self.read_count = 0
+        if self.command == Command.RESET:
+            self.command = None
+            write_data(REG_RAMDISK_DATA, 1)             # 1 == 120K RAM Disk
+        elif self.command == Command.READ:
+            self.read_count = 2
+        elif self.command == Command.READB:
+            self.read_count = 3
+        elif self.command == Command.WRITE:
+            self.cksum = 0                                   # mark ramdisk as formatted
+            self.read_count = 130
+        elif self.command == Command.WRITEB:
+            self.read_count = 4
+        elif self.command == Command.CKSUM:
+            self.command = None
+            write_data(REG_RAMDISK_DATA, self.cksum)
+        else:
+            self.command = None
 
+    def handle_data(self):
+        if self.read_count == 0:
+            print("unexpected data from host: ", read_data(REG_RAMDISK_DATA))
+        else:
+            self.buffer[self.read_pointer] = read_data(REG_RAMDISK_DATA)
+            self.read_pointer = self.read_pointer + 1
+            self.read_count = self.read_count - 1
+
+
+
+ramdisk = RamDisk()
 
 
 def poll_irq_lines():
@@ -185,17 +199,12 @@ def poll_irq_lines():
         if irq_ramdisk_command != old_irq_ramdisk_command:
             print("IRQ Ramdisk Command:", irq_ramdisk_command)
             if irq_ramdisk_command == 1:
-                handle_ramdisk_command()
+                ramdisk.handle_command()
             old_irq_ramdisk_command = irq_ramdisk_command
         if irq_ramdisk_obf != old_irq_ramdisk_obf:
             print("IRQ Ramdisk OBF:", irq_ramdisk_obf)
             if irq_ramdisk_obf == 1:
-                if ramdisk_read_count == 0:
-                    print("unexpected data from host")
-                else:
-                    ramdisk_buffer[ramdisk_pointer] = read_data(REG_RAMDISK_DATA)
-                    ramdisk_pointer = ramdisk_pointer + 1
-                    ramdisk_read_count = ramdisk_read_count - 1
+                ramdisk.handle_data()
             old_irq_ramdisk_obf = irq_ramdisk_obf
 
 
