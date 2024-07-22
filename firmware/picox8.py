@@ -1,4 +1,4 @@
-from machine import Pin
+from machine import Pin, UART
 import rp2
 from rp2 import PIO
 
@@ -172,9 +172,10 @@ class RamDisk:
 
 
 ramdisk = RamDisk()
+uart = UART(0, baudrate=4800, tx=Pin(0), rx=Pin(1))
 
 
-def poll_irq_lines():
+def main_loop():
     old_irq_tone_dialer = read_irq_tone_dialer()
     old_irq_modem_status = read_irq_modem_status()
     old_irq_ramdisk_command = read_irq_ramdisk_command()
@@ -206,6 +207,11 @@ def poll_irq_lines():
             if irq_ramdisk_obf == 1:
                 ramdisk.handle_data()
             old_irq_ramdisk_obf = irq_ramdisk_obf
+
+        if uart.any() > 0:
+            bytes = uart.read()
+            print('read from uart: ', bytes)
+            uart.write(bytes)
 
 
 def test_read_write():

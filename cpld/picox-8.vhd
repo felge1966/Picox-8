@@ -38,6 +38,12 @@ entity PicoX8 is
     pico_dir            : in    std_logic;
     pico_stb            : in    std_logic;
 
+    -- Ramdisk debug port
+    rdd_d               : out   std_logic_vector(7 downto 0);
+    rdd_rw              : out   std_logic;
+    rdd_clk             : out   std_logic;
+    rdd_cd              : out   std_logic;
+
     -- LEDs for debugging
     led0                : out   std_logic;
     led1                : out   std_logic;
@@ -93,6 +99,10 @@ begin
         oe <= '0';
         pico_oe <= '0';
 
+        rdd_clk <= '0';
+        rdd_cd <= '0';
+        rdd_rw <= '0';
+
         -- Handle access from the Z80 side
         if (ioreq_n = '0') then
           if (rd_n = '0') then
@@ -105,10 +115,18 @@ begin
                 data_out <= ramdisk_data;
                 ramdisk_ibf <= '0';
                 oe <= '1';
+
+                rdd_d <= ramdisk_data;
+                rdd_clk <= '1';
+                rdd_cd <= '1';
               when PX8_RAMDISK_CONTROL =>
                 led2_buf <= '0';
                 data_out <= (0 => ramdisk_ibf, 1 => ramdisk_obf, others => '0');
                 oe <= '1';
+
+                rdd_d <= (0 => ramdisk_ibf, 1 => ramdisk_obf, others => '0');
+                rdd_clk <= '1';
+                rdd_cd <= '0';
               when others =>
                 null;
             end case;
@@ -123,9 +141,19 @@ begin
               when PX8_RAMDISK_DATA =>
                 ramdisk_data <= data;
                 ramdisk_obf <= '1';
+
+                rdd_d <= data;
+                rdd_clk <= '1';
+                rdd_cd <= '1';
+                rdd_rw <= '1';
               when PX8_RAMDISK_CONTROL =>
                 ramdisk_command <= data;
                 irq_ramdisk_command <= '1';
+
+                rdd_d <= data;
+                rdd_clk <= '1';
+                rdd_cd <= '0';
+                rdd_rw <= '1';
               when others =>
                 null;
             end case;
@@ -181,8 +209,8 @@ begin
 
   led0 <= '0';
   led1 <= led1_buf;
-  led2 <= led2_buf;
-  led3 <= led3_buf;
+  led2 <= not ramdisk_obf;
+  led3 <= not ramdisk_ibf;
 
 end Behavioral;
 

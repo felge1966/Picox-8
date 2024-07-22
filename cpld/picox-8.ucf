@@ -59,3 +59,17 @@ NET "led0"                LOC = "24";
 NET "led1"                LOC = "25";
 NET "led2"                LOC = "28";
 NET "led3"                LOC = "29";
+
+# Ramdisk Debug Port
+NET "rdd_d[0]" LOC = "56";
+NET "rdd_d[1]" LOC = "58";
+NET "rdd_d[2]" LOC = "60";
+NET "rdd_d[3]" LOC = "64";
+NET "rdd_d[4]" LOC = "66";
+NET "rdd_d[5]" LOC = "68";
+NET "rdd_d[6]" LOC = "70";
+NET "rdd_d[7]" LOC = "72";
+
+NET "rdd_rw" LOC = "54";
+NET "rdd_clk" LOC = "52";
+NET "rdd_cd" LOC = "43";
