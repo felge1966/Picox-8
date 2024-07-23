@@ -1,3 +1,4 @@
+import time
 from machine import Pin, UART
 import rp2
 from rp2 import PIO
@@ -29,6 +30,7 @@ PIN_IRQ_TONE_DIALER = Pin(16, Pin.IN, Pin.PULL_UP)
 PIN_IRQ_MODEM_STATUS = Pin(17, Pin.IN, Pin.PULL_UP)
 PIN_IRQ_RAMDISK_COMMAND = Pin(18, Pin.IN, Pin.PULL_UP)
 PIN_IRQ_RAMDISK_OBF = Pin(19, Pin.IN, Pin.PULL_UP)
+PIN_IRQ_RAMDISK_IBF = Pin(20, Pin.IN, Pin.PULL_UP)
 
 # Register numbers
 REG_TONE_DIALER = 0
@@ -110,7 +112,13 @@ def read_irq_ramdisk_obf():
     return PIN_IRQ_RAMDISK_OBF.value()
 
 
+def read_irq_ramdisk_ibf():
+    return PIN_IRQ_RAMDISK_IBF.value()
+
+
 class RamDisk:
+
+    FLUSH_INTERVAL = 15000                                  # how often to flush ramdisk to flash
 
     class Command:
         RESET = 0
@@ -131,62 +139,135 @@ class RamDisk:
             return name_mapping.get(value, "UNKNOWN_COMMAND")
 
 
-    command = None
-    read_count = None
-    read_pointer = None
-    buffer = bytearray(131)                             # maximum number of bytes that are exchanged with host in one command
-    cksum = 3                                           # not formatted
+    def __init__(self, filename):
+        self.command = None
+        self.read_count = None
+        self.read_pointer = None
+        self.px8_buffer = bytearray(131)                         # maximum number of bytes that are exchanged with host in one command
+        self.file_buffer = bytearray(128)
+        self.cksum = 0                                           # formatted
+        self.filename = filename
+        self.pending_writes = False
+        self.last_flush = time.ticks_ms()
+        self.file = None
+        self.reopen_file()
+
+    def reopen_file(self):
+        if self.file != None:
+            self.file.close()
+        self.file = open(self.filename, 'r+b')
 
     def handle_command(self):
         Command = RamDisk.Command
         self.command = read_data(REG_RAMDISK_CONTROL)
-        print("RAM-Disk Command: ", Command.get_name(self.command))
         self.read_pointer = 0
         self.read_count = 0
         if self.command == Command.RESET:
+            print("RAM-Disk RESET")
             self.command = None
-            write_data(REG_RAMDISK_DATA, 1)             # 1 == 120K RAM Disk
+            write_data(REG_RAMDISK_DATA, 1)                  # 1 == 120K ram Disk
         elif self.command == Command.READ:
             self.read_count = 2
         elif self.command == Command.READB:
             self.read_count = 3
         elif self.command == Command.WRITE:
-            self.cksum = 0                                   # mark ramdisk as formatted
             self.read_count = 130
         elif self.command == Command.WRITEB:
             self.read_count = 4
         elif self.command == Command.CKSUM:
+            print("RAM-Disk CKSUM")
             self.command = None
             write_data(REG_RAMDISK_DATA, self.cksum)
         else:
             self.command = None
 
+    def get_sector_offset(self):
+        return self.px8_buffer[0] * 8192 + self.px8_buffer[1] * 128
+
+    def get_byte_offset(self):
+        return (self.px8_buffer[0] - 1) * 60544 + self.px8_buffer[1] * 256 + self.px8_buffer[2]
+
+    def execute_current_command(self):
+        Command = RamDisk.Command
+        if self.command == Command.READ:
+            offset = self.get_sector_offset()
+            print("RAM-Disk READ", offset)
+            self.file.seek(offset)
+            write_data(REG_RAMDISK_DATA, 0)                 # status OK
+            self.file.readinto(self.file_buffer)
+            for byte in self.file_buffer:
+                while read_irq_ramdisk_ibf() == 1:
+                    pass
+                write_data(REG_RAMDISK_DATA, byte)
+        elif self.command == Command.READB:
+            offset = self.get_byte_offset()
+            print("RAM-Disk READB", offset)
+            self.file.seek(offset)
+            byte = self.file.read(1)
+            write_data(REG_RAMDISK_DATA, 0)                 # status OK
+            while read_irq_ramdisk_ibf() == 1:
+                pass
+            write_data(REG_RAMDISK_DATA, byte)
+        elif self.command == Command.WRITE:
+            offset = self.get_sector_offset()
+            print("RAM-Disk WRITE", offset)
+            self.file.seek(offset)
+            self.file.write(self.px8_buffer[2:130])
+            write_data(REG_RAMDISK_DATA, 0)                 # status OK
+            self.pending_writes = True
+        elif self.command == Command.WRITEB:
+            offset = self.get_byte_offset()
+            print("RAM-Disk WRITEB", offset)
+            self.file.seek(offset)
+            self.file.write(self.px8_buffer[3])
+            write_data(REG_RAMDISK_DATA, 0)                 # status OK
+            self.pending_writes = True
+        else:
+            print("don't know how to execute command", self.command)
+
     def handle_data(self):
         byte = read_data(REG_RAMDISK_DATA)
-        print("RAM-Disk Data: ", hex(byte), " read_count: ", self.read_count)
         if self.read_count == 0:
-            print("unexpected data from host: ", data)
-        else:
-            self.buffer[self.read_pointer] = byte
-            self.read_pointer = self.read_pointer + 1
-            self.read_count = self.read_count - 1
+            print("unexpected data from host:", byte)
+            return
+        self.px8_buffer[self.read_pointer] = byte
+        self.read_pointer = self.read_pointer + 1
+        self.read_count = self.read_count - 1
+        if self.read_count == 0:
+            self.execute_current_command()
+
+    def flush_pending_writes(self):
+        if self.pending_writes:
+            print("RAM-Disk flushing writes")
+            self.reopen_file()
+            self.pending_writes = False
+
+    def maybe_flush_pending_writes(self):
+        now = time.ticks_ms()
+        if now < self.last_flush or now > self.last_flush + RamDisk.FLUSH_INTERVAL:
+            self.flush_pending_writes()
 
 
 
-ramdisk = RamDisk()
+ramdisk = RamDisk('ramdisk.dat')
 uart = UART(0, baudrate=4800, tx=Pin(0), rx=Pin(1))
 
 
 def main_loop():
+    iterations = 0
     while True:
         if read_irq_tone_dialer() == 1:
-            print("Tone Dialer Register: ", read_data(REG_TONE_DIALER))
+            print("Tone Dialer Register:", read_data(REG_TONE_DIALER))
         if read_irq_modem_status() == 1:
-            print("Modem Status Register: ", read_data(REG_MODEM_STATUS))
+            print("Modem Status Register:", read_data(REG_MODEM_STATUS))
         if read_irq_ramdisk_command() == 1:
             ramdisk.handle_command()
         if read_irq_ramdisk_obf() == 1:
             ramdisk.handle_data()
+        iterations = iterations + 1
+        if iterations == 1000:
+            iterations = 0
+            ramdisk.maybe_flush_pending_writes()
 
 #        if uart.any() > 0:
 #            bytes = uart.read()

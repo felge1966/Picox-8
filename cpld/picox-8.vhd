@@ -12,6 +12,9 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 -- signal, with the RP2040 making changes only near the rising edge and
 -- sampling near the falling edge.
 
+-- FIXME: Is there a race condition with the IBF and OBF IRQ signals, i.e. do
+-- they need to be delayed by a cycle to prevent buffer overwrites?
+
 entity PicoX8 is
   Port (
     -- PX-8 expansion bus
@@ -32,6 +35,7 @@ entity PicoX8 is
     irq_modem_control   : out   std_logic;
     irq_ramdisk_command : out   std_logic;
     irq_ramdisk_obf     : out   std_logic;
+    irq_ramdisk_ibf     : out   std_logic;
     -- Pico register access port
     pico_data           : inout std_logic_vector(7 downto 0);
     pico_addr           : in    std_logic_vector(2 downto 0);
@@ -43,7 +47,6 @@ entity PicoX8 is
     rdd_rw              : out   std_logic;
     rdd_clk             : out   std_logic;
     rdd_cd              : out   std_logic;
-    rdd_ibf             : out   std_logic;
     rdd_obf             : out   std_logic;
 
     -- LEDs for debugging
@@ -178,8 +181,7 @@ begin
               when PICO_RAMDISK_CONTROL =>
                 pico_data_out <= ramdisk_command;
                 irq_ramdisk_command <= '0';
-                ramdisk_ibf <= '0';             -- flush buffers
-                ramdisk_obf <= '0';
+                ramdisk_ibf <= '0';
               when others =>
                 pico_data_out <= x"00";
             end case;
@@ -208,6 +210,7 @@ begin
 
   -- RAM-Disk handshake signals
   irq_ramdisk_obf <= ramdisk_obf;
+  irq_ramdisk_ibf <= ramdisk_ibf;
 
   led0 <= '0';
   led1 <= led1_buf;
@@ -215,6 +218,5 @@ begin
   led3 <= not ramdisk_ibf;
 
   rdd_obf <= ramdisk_obf;
-  rdd_ibf <= ramdisk_ibf;
 
 end Behavioral;
