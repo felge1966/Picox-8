@@ -43,6 +43,8 @@ entity PicoX8 is
     rdd_rw              : out   std_logic;
     rdd_clk             : out   std_logic;
     rdd_cd              : out   std_logic;
+    rdd_ibf             : out   std_logic;
+    rdd_obf             : out   std_logic;
 
     -- LEDs for debugging
     led0                : out   std_logic;
@@ -212,5 +214,7 @@ begin
   led2 <= not ramdisk_obf;
   led3 <= not ramdisk_ibf;
 
-end Behavioral;
+  rdd_obf <= ramdisk_obf;
+  rdd_ibf <= ramdisk_ibf;
 
+end Behavioral;

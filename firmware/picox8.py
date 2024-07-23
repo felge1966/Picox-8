@@ -162,10 +162,12 @@ class RamDisk:
             self.command = None
 
     def handle_data(self):
+        byte = read_data(REG_RAMDISK_DATA)
+        print("RAM-Disk Data: ", hex(byte), " read_count: ", self.read_count)
         if self.read_count == 0:
-            print("unexpected data from host: ", read_data(REG_RAMDISK_DATA))
+            print("unexpected data from host: ", data)
         else:
-            self.buffer[self.read_pointer] = read_data(REG_RAMDISK_DATA)
+            self.buffer[self.read_pointer] = byte
             self.read_pointer = self.read_pointer + 1
             self.read_count = self.read_count - 1
 
@@ -176,42 +178,20 @@ uart = UART(0, baudrate=4800, tx=Pin(0), rx=Pin(1))
 
 
 def main_loop():
-    old_irq_tone_dialer = read_irq_tone_dialer()
-    old_irq_modem_status = read_irq_modem_status()
-    old_irq_ramdisk_command = read_irq_ramdisk_command()
-    old_irq_ramdisk_obf = read_irq_ramdisk_obf()
-
     while True:
-        irq_tone_dialer = read_irq_tone_dialer()
-        irq_modem_status = read_irq_modem_status()
-        irq_ramdisk_command = read_irq_ramdisk_command()
-        irq_ramdisk_obf = read_irq_ramdisk_obf()
+        if read_irq_tone_dialer() == 1:
+            print("Tone Dialer Register: ", read_data(REG_TONE_DIALER))
+        if read_irq_modem_status() == 1:
+            print("Modem Status Register: ", read_data(REG_MODEM_STATUS))
+        if read_irq_ramdisk_command() == 1:
+            ramdisk.handle_command()
+        if read_irq_ramdisk_obf() == 1:
+            ramdisk.handle_data()
 
-        if irq_tone_dialer != old_irq_tone_dialer:
-            print("IRQ Tone Dialer:", irq_tone_dialer)
-            if irq_tone_dialer == 1:
-                print("Tone Dialer Register: ", read_data(REG_TONE_DIALER))
-            old_irq_tone_dialer = irq_tone_dialer
-        if irq_modem_status != old_irq_modem_status:
-            print("IRQ Modem Status:", irq_modem_status)
-            if irq_modem_status == 1:
-                print("Modem Status Register: ", read_data(REG_MODEM_STATUS))
-            old_irq_modem_status = irq_modem_status
-        if irq_ramdisk_command != old_irq_ramdisk_command:
-            print("IRQ Ramdisk Command:", irq_ramdisk_command)
-            if irq_ramdisk_command == 1:
-                ramdisk.handle_command()
-            old_irq_ramdisk_command = irq_ramdisk_command
-        if irq_ramdisk_obf != old_irq_ramdisk_obf:
-            print("IRQ Ramdisk OBF:", irq_ramdisk_obf)
-            if irq_ramdisk_obf == 1:
-                ramdisk.handle_data()
-            old_irq_ramdisk_obf = irq_ramdisk_obf
-
-        if uart.any() > 0:
-            bytes = uart.read()
-            print('read from uart: ', bytes)
-            uart.write(bytes)
+#        if uart.any() > 0:
+#            bytes = uart.read()
+#            print('read from uart: ', bytes)
+#            uart.write(bytes)
 
 
 def test_read_write():
@@ -230,7 +210,3 @@ def test_read_write():
     # Example read operation
     data = read_data(0b000)  # Read from register 0
     print("Data read:", data)
-
-
-if __name__ == "__main__":
-    main()

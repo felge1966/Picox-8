@@ -73,3 +73,6 @@ NET "rdd_d[7]" LOC = "72";
 NET "rdd_rw" LOC = "54";
 NET "rdd_clk" LOC = "52";
 NET "rdd_cd" LOC = "43";
+
+NET "rdd_ibf" LOC = "41";
+NET "rdd_obf" LOC = "39";
