@@ -1,5 +1,35 @@
 import machine
 import cpld
+import rp2
+from machine import Pin
+
+@rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
+def tone_generator():
+    pull()
+    wrap_target()
+    set(pins, 1)
+    mov(x, osr)
+    label("delay_high")
+    jmp(x_dec, "delay_high")
+    set(pins, 0)
+    mov(x, osr)
+    label("delay_low")
+    jmp(x_dec, "delay_low")
+
+tone_generator1 = rp2.StateMachine(4, tone_generator, freq=10_000_000, set_base=Pin(28))
+tone_generator2 = rp2.StateMachine(5, tone_generator, freq=10_000_000, set_base=Pin(28))
+
+
+def set_freq(sm, f):
+    if f > 0:
+        sm.active(0)
+        delay = int(1/f/100e-9/2)-3
+        sm.restart()
+        sm.put(delay)
+        sm.active(1)
+    else:
+        sm.restart()                                        # restart to set output to low if running
+
 
 class Control:
   OHC = 0x01
@@ -39,8 +69,13 @@ class Modem:
             high = byte & 0x03
             low = (byte & 0x0c) >> 2
             print("DTMF tones:", low, Modem.DTMF_LOW[low], high, Modem.DTMF_HIGH[high])
+            set_freq(tone_generator1, Modem.DTMF_LOW[low])
+            set_freq(tone_generator2, Modem.DTMF_HIGH[high])
+
         else:
             print("DTMF off")
+            set_freq(tone_generator1, 0)
+            set_freq(tone_generator2, 0)
 
     def poll_rx(self):
         if self.uart.any() > 0:
