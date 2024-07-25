@@ -96,7 +96,7 @@ class Modem:
         self.reset()
 
     def reset(self):
-        self.status = Status.CD | Status.RNG
+        self.status = Status.RNG | Status.CD
         cpld.write_data(cpld.REG_MODEM_STATUS, self.status)
         self.state = State.IDLE
         self.answer_mode = False
