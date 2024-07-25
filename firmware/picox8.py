@@ -21,7 +21,7 @@ def main_loop():
             iterations = 0
             ramdisk.maybe_flush_pending_writes()
 
-        modem.poll_rx()
+        modem.poll()
 
 
 def test_read_write():
