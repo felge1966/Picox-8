@@ -9,7 +9,10 @@ def connect():
   if not wifi_config:
     print('No "wifi" configuration')
     return
-  nic = network.WLAN(network.STA_IF)
+  if nic:
+    nic.active(False)
+  else:
+    nic = network.WLAN(network.STA_IF)
   nic.active(True)
   nic.connect(wifi_config[0], wifi_config[1])
 
