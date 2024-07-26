@@ -3,6 +3,7 @@ import config
 import gc
 from abbrev import abbreviate_methods
 from collections import deque
+import wifi
 
 PROMPT = "picox8> "
 
@@ -18,7 +19,7 @@ class CommandProcessor:
     self.cmd_abbrevs = abbreviate_methods(self, 'cmd__')
     self.set_abbrevs = abbreviate_methods(self, 'cmd_set_')
     self.show_abbrevs = abbreviate_methods(self, 'cmd_show_')
-    self.history = deque()
+    self.history = deque([], MAXHISTORY)
     self.history_pointer = -1
     self.reset()
 
@@ -50,6 +51,7 @@ upload <image>                        Upload RAM-Disk image to server""")
   def cmd_show_status(self, args):
     gc.collect()
     self.say(f'Free memory: {gc.mem_free()}')
+    self.say(f'WiFi status: {wifi.status()}')
 
 
   def cmd_set_wifi(self, args):
@@ -57,6 +59,7 @@ upload <image>                        Upload RAM-Disk image to server""")
       self.say(f'Incorrect arguments to "set wifi", need SSID and key')
       return
     config.set('wifi', args)
+    wifi.connect()
 
 
   def cmd_set_phonebook(self, args):
@@ -167,8 +170,6 @@ upload <image>                        Upload RAM-Disk image to server""")
       if input != '':
         if not len(self.history) or input != self.history[0]:
           self.history.appendleft(input)
-          if len(self.history) > MAXHISTORY:
-            self.history.pop()
         self.history_pointer = -1
         command, *args = SPLIT_RE.split(input)
         self.execute_command(command, args)

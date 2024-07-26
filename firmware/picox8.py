@@ -1,11 +1,13 @@
 from modem import Modem
 from ramdisk import RamDisk
 import cpld
+import wifi
 
 ramdisk = RamDisk('ramdisk.dat')
 modem = Modem()
 
 def main_loop():
+    wifi.connect()
     iterations = 0
     while True:
         if cpld.read_irq_tone_dialer() == 1:
