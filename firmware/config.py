@@ -18,9 +18,11 @@ def save():
   
 config = load()
 
-def get(key):
+def get(key, default):
   if key in config:
     return config[key]
+  else:
+    return default
 
 def set(key, value):
   config[key] = value
