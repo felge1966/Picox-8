@@ -177,6 +177,8 @@ class Modem:
     def reset(self):
         self.status = Status.RNG | Status.CD
         cpld.write_data(cpld.REG_MODEM_STATUS, self.status)
+        set_freq(tone_generator1, 0)
+        set_freq(tone_generator2, 0)
         self.state = State.IDLE
         self.answer_mode = False
         self.old_modem_control = 0
