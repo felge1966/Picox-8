@@ -5,7 +5,8 @@ from abbrev import abbreviate_methods
 from collections import deque
 import wifi
 
-PROMPT = "picox8> "
+BANNER = '\r\nPicoX-8 configuration interface.  Type "help" for help\r\n\n'
+PROMPT = "picox-8> "
 
 CLEAN_RE = re.compile(r'^\s*(.*?)\s*$')
 SPLIT_RE = re.compile(r'\s+')
@@ -21,6 +22,7 @@ class CommandProcessor:
     self.show_abbrevs = abbreviate_methods(self, 'cmd_show_')
     self.history = deque([], MAXHISTORY)
     self.history_pointer = -1
+    self.terminal.write(BANNER)
     self.reset()
 
 

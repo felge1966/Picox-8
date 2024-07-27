@@ -106,8 +106,9 @@ class State(Enum):
     ECHO_CANCEL = 4
     HANDSHAKE = 5
     CONNECTED = 6
-    COMMAND_MODE = 7
-    CALL_FAILED = 8
+    ENTER_COMMAND_MODE = 7
+    COMMAND_MODE = 8
+    CALL_FAILED = 9
 
 
 class CallProgressTone:
@@ -141,7 +142,7 @@ RING_TONE = CallProgressTone((425, 1000, 0, 4000))
 ECHO_CANCEL_TONE = CallProgressTone((2100, 430, 20, 20) * 6 + (2225, 430, 20, 20) * 6)
 HANDSHAKE_ANSWER_TONE = CallProgressTone((1650, CONNECT_DELAY))
 HANDSHAKE_ORIGINATE_TONE = CallProgressTone((980, CONNECT_DELAY))
-COMMAND_MODE_TONE = CallProgressTone((425, 240, 0, 240, 425, 240, 0, 1280))
+COMMAND_MODE_TONE = CallProgressTone((425, 240, 0, 240, 425, 240, 0, 3000))
 
 
 class TonePlayer:
@@ -224,9 +225,8 @@ class Modem:
                 self.number_buffer += arg
                 if self.number_buffer == '***':
                     self.carrier_detected(True)
-                    self.command_processor = CommandProcessor(self.uart)
                     self.tone_player = TonePlayer(COMMAND_MODE_TONE)
-                    self.set_state(State.COMMAND_MODE)
+                    self.set_state(State.ENTER_COMMAND_MODE)
             if event == Event.TICK:
                 self.tick_count += 1
                 if self.tick_count == TICKS_PER_SECOND:
@@ -273,6 +273,7 @@ class Modem:
             if event == Event.TICK:
                 if not self.tone_player.tick():
                     return
+                self.sync_baud()
                 self.set_state(State.CONNECTED)
         elif self.state == State.CONNECTED:
             if event == Event.UART_RX:
@@ -293,10 +294,14 @@ class Modem:
                     if e.errno != errno.EAGAIN:
                         print(f'Error {e} reading from socket, closing connection')
                         self.reset()
-        elif self.state == State.COMMAND_MODE:
+        elif self.state == State.ENTER_COMMAND_MODE:
             if event == Event.TICK:
                 if self.tone_player and self.tone_player.tick():
                     self.tone_player = None
+                    self.sync_baud()
+                    self.command_processor = CommandProcessor(self.uart)
+                    self.set_state(State.COMMAND_MODE)
+        elif self.state == State.COMMAND_MODE:
             if event == Event.UART_RX:
                 self.command_processor.userinput(arg)
 
