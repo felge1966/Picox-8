@@ -1,5 +1,6 @@
 import network
 import config
+import socket
 
 nic = None
 
@@ -15,6 +16,19 @@ def connect():
     nic = network.WLAN(network.STA_IF)
   nic.active(True)
   nic.connect(wifi_config[0], wifi_config[1])
+
+
+def connected():
+  return nic and nic.status() == network.STAT_GOT_IP
+
+
+def resolve(host, port):
+  try:
+    info = socket.getaddrinfo(host, port)
+  except OSError:
+    print(f'Cannot resolve host {host}')
+    return None
+  return info[0][-1]
 
 
 def status():

@@ -63,14 +63,17 @@ architecture Behavioral of PicoX8 is
   constant PX8_MODEM_STATUS     : std_logic_vector(7 downto 0) := x"86";
   constant PX8_RAMDISK_DATA     : std_logic_vector(7 downto 0) := x"80";
   constant PX8_RAMDISK_CONTROL  : std_logic_vector(7 downto 0) := x"81";
+  constant PX8_BAUDRATE         : std_logic_vector(7 downto 0) := x"00";
   constant PICO_TONE_DIALER     : std_logic_vector(2 downto 0) := "000";
   constant PICO_MODEM_CONTROL   : std_logic_vector(2 downto 0) := "001";
   constant PICO_MODEM_STATUS    : std_logic_vector(2 downto 0) := "010";
   constant PICO_RAMDISK_DATA    : std_logic_vector(2 downto 0) := "011";
   constant PICO_RAMDISK_CONTROL : std_logic_vector(2 downto 0) := "100";
+  constant PICO_BAUDRATE        : std_logic_vector(2 downto 0) := "101";
   signal modem_tone_dialer      : std_logic_vector(7 downto 0);
   signal modem_control          : std_logic_vector(7 downto 0);
   signal modem_status           : std_logic_vector(7 downto 0);
+  signal baudrate               : std_logic_vector(7 downto 0);
   signal ramdisk_data           : std_logic_vector(7 downto 0);
   signal ramdisk_command        : std_logic_vector(7 downto 0);
   signal ramdisk_ibf            : std_logic;
@@ -90,6 +93,7 @@ begin
         modem_tone_dialer   <= x"00";
         modem_control       <= x"00";
         modem_status        <= x"00";
+        baudrate            <= x"00";
         ramdisk_data        <= x"00";
         ramdisk_command     <= x"00";
         ramdisk_ibf         <= '0';
@@ -143,6 +147,8 @@ begin
               when PX8_MODEM_CONTROL =>
                 modem_control <= data;
                 irq_modem_control <= '1';
+              when PX8_BAUDRATE =>
+                baudrate <= data;
               when PX8_RAMDISK_DATA =>
                 ramdisk_data <= data;
                 ramdisk_obf <= '1';
@@ -175,6 +181,8 @@ begin
               when PICO_MODEM_CONTROL =>
                 pico_data_out <= modem_control;
                 irq_modem_control <= '0';
+              when PICO_BAUDRATE =>
+                pico_data_out <= baudrate;
               when PICO_RAMDISK_DATA =>
                 pico_data_out <= ramdisk_data;
                 ramdisk_obf <= '0';

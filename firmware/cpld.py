@@ -37,6 +37,7 @@ REG_MODEM_CONTROL = 1
 REG_MODEM_STATUS = 2
 REG_RAMDISK_DATA = 3
 REG_RAMDISK_CONTROL = 4
+REG_BAUDRATE = 5
 
 # PIO program to communicate to the CPLD
 @rp2.asm_pio(out_shiftdir=PIO.SHIFT_RIGHT,

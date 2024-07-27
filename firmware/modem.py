@@ -1,10 +1,17 @@
 import machine
 import cpld
 import rp2
+import time
+import socket
+import errno
 from machine import Pin
-from command_processor import CommandProcessor
 
-TICKS_PER_SECOND = 100
+from command_processor import CommandProcessor
+import wifi
+import config
+
+TICK_MS = 10
+TICKS_PER_SECOND = 1000 / TICK_MS
 
 @rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
 def tone_generator():
@@ -32,6 +39,18 @@ def set_freq(sm, f):
         sm.active(1)
     else:
         sm.restart()                                        # restart to set output to low if running
+
+
+REG_TO_BAUD = {
+    0: 110,
+    32: 300,
+    48: 600,
+    64: 1200,
+    80: 2400,
+    96: 4800,
+    112: 9600,
+    160: 19200,
+}
 
 
 class Enum():
@@ -84,15 +103,75 @@ class State(Enum):
     OFF_HOOK = 1
     DIALING = 2
     RINGING = 3
-    ANSWERED = 4
+    ECHO_CANCEL = 4
     HANDSHAKE = 5
     CONNECTED = 6
     COMMAND_MODE = 7
+    CALL_FAILED = 8
+
+
+class CallProgressTone:
+    def __init__(self, tones, repeats=False):
+        self.tones = tones
+        self.repeats = repeats
+        assert(len(self.tones) % 1 == 0)
+        self.reset()
+
+    def reset(self):
+        self.pos = 0
+
+    def done(self):
+        return len(self.tones) == self.pos
+
+    def next(self):
+        frequency = self.tones[self.pos]
+        duration = self.tones[self.pos+1]
+        self.pos += 2
+        if self.repeats and len(self.tones) == self.pos:
+            self.pos = 0
+        return frequency, duration
+
+
+CONNECT_DELAY = 3000 # time to wait before opening the data channel after carrier detect was signalled
+
+INVALID_NUMBER_TONE = CallProgressTone((950, 330, 1450, 330, 1880, 330, 0, 1000), repeats=True)
+NO_NETWORK_TONE = CallProgressTone((425, 240, 0, 240), repeats=True)
+BUSY_TONE = CallProgressTone((425, 480, 0, 430), repeats=True)
+RING_TONE = CallProgressTone((425, 1000, 0, 4000))
+ECHO_CANCEL_TONE = CallProgressTone((2100, 430, 20, 20) * 6 + (2225, 430, 20, 20) * 6)
+HANDSHAKE_ANSWER_TONE = CallProgressTone((1650, CONNECT_DELAY))
+HANDSHAKE_ORIGINATE_TONE = CallProgressTone((980, CONNECT_DELAY))
+COMMAND_MODE_TONE = CallProgressTone((425, 240, 0, 240, 425, 240, 0, 1280))
+
+
+class TonePlayer:
+    def __init__(self, tone):
+        self.tone = tone
+        self.tone.reset()
+        self.play_next()
+
+    def play_next(self):
+        frequency, duration = self.tone.next()
+        set_freq(tone_generator1, frequency)
+        self.ticks_remaining = duration / TICK_MS
+
+    def tick(self):
+        self.ticks_remaining -= 1
+        if self.ticks_remaining > 0:
+            return
+        if self.tone.done():
+            set_freq(tone_generator1, 0)
+            return True
+        self.play_next()
 
 
 class Modem:
     def __init__(self):
-        self.uart = machine.UART(0, baudrate=4800, tx=machine.Pin(0), rx=machine.Pin(1))
+        self.baud = 4800
+        self.uart = machine.UART(0, baudrate=self.baud, tx=machine.Pin(0), rx=machine.Pin(1))
+        self.socket = None
+        self.last_tick = time.ticks_ms()
+        self.tick_count = 0
         self.reset()
 
     def reset(self):
@@ -102,10 +181,29 @@ class Modem:
         self.answer_mode = False
         self.old_modem_control = 0
         self.number_buffer = ''
+        self.tone_player = None
+        self.command_processor = None
+        self.sync_baud()
+        if self.socket:
+            self.socket.close()
+            self.socket = None
+
+    def sync_baud(self):
+        baud_control = cpld.read_data(cpld.REG_BAUDRATE) & 0xf0
+        if baud_control in REG_TO_BAUD:
+            self.baud = REG_TO_BAUD[baud_control]
+        else:
+            print(f'Unrecognized UART baud rate register value {baud_control}')
+        print(f'UART baud rate: {self.baud}')
+        self.uart.init(self.baud, bits=8, parity=None, stop=1)
 
     def set_state(self, state):
         print("Modem", State.get_name(self.state), "->", State.get_name(state))
         self.state = state
+
+    def call_failed(self, tone):
+        self.tone_player = TonePlayer(tone)
+        self.set_state(State.CALL_FAILED)
 
     def handle_event(self, event, arg):
         if self.state == State.IDLE:
@@ -116,26 +214,87 @@ class Modem:
         elif self.state == State.OFF_HOOK:
             if event == Event.DTMF:
                 self.number_buffer += arg
+                self.tick_count = 0
+                self.set_state(State.DIALING)
+        elif self.state == State.DIALING:
+            if event == Event.DTMF:
+                self.tick_count = 0
+                self.number_buffer += arg
                 if self.number_buffer == '***':
                     self.carrier_detected(True)
                     self.command_processor = CommandProcessor(self.uart)
+                    self.tone_player = TonePlayer(COMMAND_MODE_TONE)
                     self.set_state(State.COMMAND_MODE)
             if event == Event.TICK:
                 self.tick_count += 1
                 if self.tick_count == TICKS_PER_SECOND:
-                    self.set_state(State.DIALING)
-        elif self.state == State.DIALING:
-            pass
+                    if not wifi.connected:
+                        self.call_failed(NO_NETWORK_TONE)
+                        return
+                    phonebook = config.get('phonebook', {})
+                    if not self.number_buffer in phonebook:
+                        self.call_failed(INVALID_NUMBER_TONE)
+                        return
+                    phonebook_entry = phonebook[self.number_buffer]
+                    host, port = phonebook_entry
+                    call_address = wifi.resolve(host, int(port))
+                    if not call_address:
+                        self.call_failed(NO_NETWORK_TONE)
+                        return
+                    self.socket = socket.socket(socket.IPPROTO_TCP)
+                    try:
+                        self.socket.connect(call_address)
+                    except OSError as e:
+                        print(f'call failed {e}')
+                        self.call_failed(BUSY_TONE)
+                        return
+                    self.socket.setblocking(False)
+                    self.tone_player = TonePlayer(RING_TONE)
+                    self.set_state(State.RINGING)
+        elif self.state == State.CALL_FAILED:
+            if event == Event.TICK:
+                self.tone_player.tick()
         elif self.state == State.RINGING:
-            pass
-        elif self.state == State.ANSWERED:
-            pass
+            if event == Event.TICK:
+                if not self.tone_player.tick():
+                    return
+                self.tone_player = TonePlayer(ECHO_CANCEL_TONE)
+                self.set_state(State.ECHO_CANCEL)
+        elif self.state == State.ECHO_CANCEL:
+            if event == Event.TICK:
+                if not self.tone_player.tick():
+                    return
+                self.carrier_detected(True)
+                self.tone_player = TonePlayer(HANDSHAKE_ANSWER_TONE if self.answer_mode else HANDSHAKE_ORIGINATE_TONE)
+                self.set_state(State.HANDSHAKE)
         elif self.state == State.HANDSHAKE:
-            if byte & Control.TXC:
-                set_freq(tone_generator1, 1650 if byte & self.answer_mode else 980)
+            if event == Event.TICK:
+                if not self.tone_player.tick():
+                    return
+                self.set_state(State.CONNECTED)
         elif self.state == State.CONNECTED:
-            pass
+            if event == Event.UART_RX:
+                try:
+                    self.socket.write(arg)
+                except OSError as e:
+                    print(f'Error {e} writing to socket, closing connection')
+                    self.socket.close()
+                    self.reset()
+            if event == Event.TICK:
+                try:
+                    data = self.socket.recv(128)
+                    if data:
+                        self.uart.write(data)
+                    else:
+                        self.reset()
+                except OSError as e:
+                    if e.errno != errno.EAGAIN:
+                        print(f'Error {e} reading from socket, closing connection')
+                        self.reset()
         elif self.state == State.COMMAND_MODE:
+            if event == Event.TICK:
+                if self.tone_player and self.tone_player.tick():
+                    self.tone_player = None
             if event == Event.UART_RX:
                 self.command_processor.userinput(arg)
 
@@ -194,16 +353,19 @@ class Modem:
         if byte & 0x10:
             high = byte & 0x03
             low = (byte & 0x0c) >> 2
-            print("DTMF tones:", low, Modem.DTMF_LOW[low], high, Modem.DTMF_HIGH[high])
             set_freq(tone_generator1, Modem.DTMF_LOW[low])
             set_freq(tone_generator2, Modem.DTMF_HIGH[high])
-            self.handle_event(Event.DTMF, Modem.DTMF_FREQ_MAP[byte & 0x0f])
+            self.dtmf_digit = Modem.DTMF_FREQ_MAP[byte & 0x0f]
         else:
-            print("DTMF off")
             set_freq(tone_generator1, 0)
             set_freq(tone_generator2, 0)
+            print(f'DTMF digit {self.dtmf_digit}')
+            self.handle_event(Event.DTMF, self.dtmf_digit)
 
     def poll(self):
         if self.uart.any() > 0:
             self.handle_event(Event.UART_RX, self.uart.read())
-
+        now = time.ticks_ms()
+        if time.ticks_diff(now, self.last_tick) >= TICK_MS:
+            self.last_tick = now
+            self.handle_event(Event.TICK, None)
