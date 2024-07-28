@@ -227,6 +227,8 @@ class Modem:
     def process_telnet_options(self, data):
         i = 0
         count = len(data)
+        j = 0
+        return_data = bytearray(data)
         while i < count:
             if data[i] == IAC and (count - i) >= 3:
                 iac, cmd, opt = data[i:i+3]
@@ -246,8 +248,10 @@ class Modem:
                     print(f'Unrecognized telnet option {cmd} {opt}')
                 i += 3
             else:
-                break
-        return data[i:]
+                return_data[j] = data[i]
+                j += 1
+                i += 1
+        return return_data[:j]
 
     def handle_event(self, event, arg):
         if self.state == State.IDLE:
