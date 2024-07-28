@@ -145,6 +145,21 @@ HANDSHAKE_ORIGINATE_TONE = CallProgressTone((980, CONNECT_DELAY))
 COMMAND_MODE_TONE = CallProgressTone((425, 240, 0, 240, 425, 240, 0, 3000))
 
 
+# telnet option negotiation
+
+# command codes
+IAC  = 255  # Interpret as Command
+DONT = 254
+DO   = 253
+WONT = 252
+WILL = 251
+
+# Telnet options
+ECHO = 1
+SGA  = 3
+
+
+
 class TonePlayer:
     def __init__(self, tone):
         self.tone = tone
@@ -183,6 +198,7 @@ class Modem:
         self.state = State.IDLE
         self.answer_mode = False
         self.old_modem_control = 0
+        self.dtmf_digit = None
         self.number_buffer = ''
         self.tone_player = None
         self.command_processor = None
@@ -207,6 +223,31 @@ class Modem:
     def call_failed(self, tone):
         self.tone_player = TonePlayer(tone)
         self.set_state(State.CALL_FAILED)
+
+    def process_telnet_options(self, data):
+        i = 0
+        count = len(data)
+        while i < count:
+            if data[i] == IAC and (count - i) >= 3:
+                iac, cmd, opt = data[i:i+3]
+                if cmd == DO:
+                    print(f'telnet DO {opt}')
+                    self.socket.write(bytes([IAC, WILL if opt == SGA else WONT, opt]))
+                elif cmd == DONT:
+                    print(f'telnet DONT {opt}')
+                    self.socket.write(bytes([IAC, WONT, opt]))
+                elif cmd == WILL:
+                    print(f'telnet WILL {opt}')
+                    self.socket.write(bytes([IAC, DO if opt == SGA or opt == ECHO else DONT, opt]))
+                elif cmd == WONT:
+                    print(f'telnet WONT {opt}')
+                    self.socket.write(bytes([IAC, DONT, opt]))
+                else:
+                    print(f'Unrecognized telnet option {cmd} {opt}')
+                i += 3
+            else:
+                break
+        return data[i:]
 
     def handle_event(self, event, arg):
         if self.state == State.IDLE:
@@ -274,6 +315,11 @@ class Modem:
                 if not self.tone_player.tick():
                     return
                 self.sync_baud()
+                try:
+                    self.socket.write(bytes([IAC, DO, SGA,
+                                             IAC, DO, ECHO]))
+                except:
+                    pass                                    # ignore errors during telnet option negotiation
                 self.set_state(State.CONNECTED)
         elif self.state == State.CONNECTED:
             if event == Event.UART_RX:
@@ -287,6 +333,7 @@ class Modem:
                 try:
                     data = self.socket.recv(128)
                     if data:
+                        data = self.process_telnet_options(data)
                         self.uart.write(data)
                     else:
                         self.reset()
