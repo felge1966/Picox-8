@@ -1,7 +1,9 @@
 import cpld
 import time
+import config
 
-FLUSH_INTERVAL = 15000                                  # how often to flush ramdisk to flash
+IMAGE_SIZE     = 122880          # size of a ramdisk image
+FLUSH_INTERVAL = 15000           # how often to flush ramdisk to flash
 
 class Command:
     RESET = 0
@@ -23,14 +25,14 @@ class Command:
 
 
 class RamDisk:
-    def __init__(self, filename):
+    def __init__(self):
+        self.filename = config.get("ramdisk", "/ramdisk.dsk")
         self.command = None
         self.read_count = None
         self.read_pointer = None
         self.px8_buffer = bytearray(131)                         # maximum number of bytes that are exchanged with host in one command
         self.file_buffer = bytearray(128)
         self.cksum = 0                                           # formatted
-        self.filename = filename
         self.pending_writes = False
         self.last_flush = time.ticks_ms()
         self.file = None

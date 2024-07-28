@@ -109,7 +109,7 @@ class State(Enum):
     ENTER_COMMAND_MODE = 7
     COMMAND_MODE = 8
     CALL_FAILED = 9
-
+    DRAIN_UART = 10
 
 class CallProgressTone:
     def __init__(self, tones, repeats=False):
@@ -342,11 +342,11 @@ class Modem:
                         data = self.process_telnet_options(data)
                         self.uart.write(data)
                     else:
-                        self.reset()
+                        self.set_state(State.DRAIN_UART)
                 except OSError as e:
                     if e.errno != errno.EAGAIN:
                         print(f'Error {e} reading from socket, closing connection')
-                        self.reset()
+                        self.set_state(State.DRAIN_UART)
         elif self.state == State.ENTER_COMMAND_MODE:
             if event == Event.TICK:
                 if self.tone_player and self.tone_player.tick():
@@ -356,7 +356,12 @@ class Modem:
                     self.set_state(State.COMMAND_MODE)
         elif self.state == State.COMMAND_MODE:
             if event == Event.UART_RX:
-                self.command_processor.userinput(arg)
+                if self.command_processor.userinput(arg):
+                    self.set_state(State.DRAIN_UART)
+        elif self.state == State.DRAIN_UART:
+            if event == Event.TICK:
+                if self.uart.txdone():
+                    self.reset()
 
 
     def handle_control(self):

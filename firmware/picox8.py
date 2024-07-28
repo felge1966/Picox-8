@@ -2,8 +2,11 @@ from modem import Modem
 from ramdisk import RamDisk
 import cpld
 import wifi
+import storage
+import config
 
-ramdisk = RamDisk('ramdisk.dat')
+storage.mount_sdcard()
+ramdisk = RamDisk()
 modem = Modem()
 
 def main_loop():

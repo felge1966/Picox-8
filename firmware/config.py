@@ -9,7 +9,7 @@ def load():
     if exc.errno == errno.ENOENT:
       return {}
     else:
-      pass
+      raise exc
 
 def save():
   with open("config.json", "w") as f:

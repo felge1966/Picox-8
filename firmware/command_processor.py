@@ -4,6 +4,9 @@ import gc
 from abbrev import abbreviate_methods
 from collections import deque
 import wifi
+import ramdisk
+import storage
+import uos
 
 BANNER = '\r\nPicoX-8 configuration interface.  Type "help" for help\r\n\n'
 PROMPT = "picox-8> "
@@ -24,6 +27,7 @@ class CommandProcessor:
     self.history_pointer = -1
     self.terminal.write(BANNER)
     self.reset()
+    self.done = False
 
 
   def reset(self):
@@ -40,20 +44,24 @@ class CommandProcessor:
     self.say("""\
 PicoX-8 configuration command help\r
 \r
-set wifi <ssid> <password>            Set WiFi SSID and password\r
-set phonebook <number> <host> <port>  Set phonebook entry\r
-show phonebook                        Show phonebook\r
-show status                           Show system status\r
-show images                           Show RAM-Disk images\r
-mount <image>                         Mount RAM-Disk image\r
-download <image>                      Download RAM-Disk image from server\r
-upload <image>                        Upload RAM-Disk image to server""")
+show status                            Show system status\r
+
+set wifi <ssid> <password>             Set WiFi SSID and password\r
+set phonebook <number> <host>[:<port>] Set phonebook entry\r
+show phonebook                         Show phonebook\r
+
+ls                                     List files on SD-Card\r
+set ramdisk <filename>                 Set RAM-Disk file\r
+
+quit                                   Exit configuration""")
 
 
   def cmd_show_status(self, args):
     gc.collect()
     self.say(f'Free memory: {gc.mem_free()}')
     self.say(f'WiFi status: {wifi.status()}')
+    mounted = 'mounted' if storage.sdcard_mounted() else 'not mounted'
+    self.say(f'SD-Card    : {mounted}')
 
 
   def cmd_set_wifi(self, args):
@@ -65,22 +73,29 @@ upload <image>                        Upload RAM-Disk image to server""")
 
 
   def cmd_set_phonebook(self, args):
-    if len(args) != 3:
+    if len(args) != 2:
       self.say(f'Incorrect arguments to "set phonebook", try "help"')
       return
-    number, host, port = args
+    number, host_port = args
     if not NUMBER_RE.match(number):
       self.say('Number must be numeric')
       return
+    if ':' in host_port:
+      host, port = host_port.split(':')
+    else:
+      host = host_port
+      port = '23'
     if not NUMBER_RE.match(port):
       self.say('Port must be numeric')
       return
+    port = int(port)
     # fixme check number and port for digits only
     phonebook = config.get('phonebook', {})
     phonebook[number] = [host, port]
+
     config.set('phonebook', phonebook)
     config.save()
-    self.say('Phonebook entry saved')
+    self.say(f'Phonebook entry for number {number} saved')
 
 
   def cmd_show_phonebook(self, args):
@@ -91,8 +106,50 @@ upload <image>                        Upload RAM-Disk image to server""")
     if phonebook == None:
       self.say('No phonebook entries defined')
     else:
-      for number, entry in phonebook.items():
-        self.say(f'{number}: {entry[0]}:{entry[1]}')
+      self.say(f'Number     Host')
+      self.say(f'----------------------------------------')
+      for number in sorted(phonebook.keys()):
+        entry = phonebook[number]
+        self.say(f'{number:<10} {entry[0]}:{entry[1]}')
+
+
+  def cmd__ls(self, args):
+    if len(args) != 0:
+      self.say(f'Extra argument(s) to "ls", try "help"')
+      return
+
+    storage.umount_sdcard()
+    if not storage.mount_sdcard():
+      self.say('No SD-Card found')
+      return
+    files = uos.listdir(storage.SDCARD_DIR)
+    self.say(f'Name                 Size')
+    self.say(f'-------------------------------')
+    for name in sorted(files):
+      size = uos.stat(f'{storage.SDCARD_DIR}/{name}')[6]
+      self.say(f'{name:<20} {size}')
+
+
+  def cmd_set_ramdisk(self, args):
+    if len(args) != 1:
+      self.say('Missing filename argument to "set ramdisk", try "help"')
+      return
+    path = f'{storage.SDCARD_DIR}/{args[0]}'
+    try:
+      size = uos.stat(path)[6]
+    except OSError as e:
+      if e.errno == errno.ENOENT:
+        size = None
+      else:
+        self.say(f'stat() error on {path}: {e}')
+        return
+    if size == None:
+      self.say(f'File {path} not found')
+      return
+    if size != ramdisk.IMAGE_SIZE:
+      self.say(f'File {path} has an unexpected size, need {ramdisk.IMAGE_SIZE} bytes in image')
+      return
+    config.set('ramdisk', path)
 
 
   def cmd__set(self, args):
@@ -118,6 +175,13 @@ upload <image>                        Upload RAM-Disk image to server""")
     else:
       self.say(f'Unknown command "show {command}", try "help"')
 
+
+  def cmd__quit(self, args):
+    if len(args) != 0:
+      self.say(f'Unexpected argument(s) to "quit", try "help"')
+      return
+    self.say(f'Exiting PicoX-8 configuration interface')
+    self.done = True
 
   def execute_command(self, command, args):
     if command in self.cmd_abbrevs:
@@ -175,12 +239,14 @@ upload <image>                        Upload RAM-Disk image to server""")
         self.history_pointer = -1
         command, *args = SPLIT_RE.split(input)
         self.execute_command(command, args)
-      self.reset()
+      if not self.done:
+        self.reset()
 
 
   def userinput(self, data):
     for c in data:
       self.handle_user_char(c)
+    return self.done
 
 
 if __name__ == '__main__':
