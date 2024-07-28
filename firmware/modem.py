@@ -224,6 +224,8 @@ class Modem:
         self.tone_player = TonePlayer(tone)
         self.set_state(State.CALL_FAILED)
 
+    # telnet option negotiation only works for options that arrive within one chunk of received
+    # data (i.e. if they span multiple socket read()s, they won't be processed)
     def process_telnet_options(self, data):
         i = 0
         count = len(data)
