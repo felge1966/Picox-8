@@ -192,7 +192,7 @@ class Modem:
 
     def reset(self):
         self.status = Status.RNG | Status.CD
-        cpld.write_data(cpld.REG_MODEM_STATUS, self.status)
+        cpld.write_reg(cpld.REG_MODEM_STATUS, self.status)
         set_freq(tone_generator1, 0)
         set_freq(tone_generator2, 0)
         self.state = State.IDLE
@@ -208,7 +208,7 @@ class Modem:
             self.socket = None
 
     def sync_baud(self):
-        baud_control = cpld.read_data(cpld.REG_BAUDRATE) & 0xf0
+        baud_control = cpld.read_reg(cpld.REG_BAUDRATE) & 0xf0
         if baud_control in REG_TO_BAUD:
             self.baud = REG_TO_BAUD[baud_control]
         else:
@@ -360,7 +360,7 @@ class Modem:
 
 
     def handle_control(self):
-        byte = cpld.read_data(cpld.REG_MODEM_CONTROL)
+        byte = cpld.read_reg(cpld.REG_MODEM_CONTROL)
         if byte == 0:
             print("Reset modem")
             self.reset()
@@ -399,17 +399,17 @@ class Modem:
             self.status = self.status & ~Status.CD
         else:
             self.status = self.status | Status.CD
-        cpld.write_data(cpld.REG_MODEM_STATUS, self.status)
+        cpld.write_reg(cpld.REG_MODEM_STATUS, self.status)
 
     def ringing(self, on):
         if on:
             self.status = self.status & ~Status.RNG
         else:
             self.status = self.status | Status.RNG
-        cpld.write_data(cpld.REG_MODEM_STATUS, self.status)
+        cpld.write_reg(cpld.REG_MODEM_STATUS, self.status)
 
     def handle_tone_dialer(self):
-        byte = cpld.read_data(cpld.REG_TONE_DIALER)
+        byte = cpld.read_reg(cpld.REG_TONE_DIALER)
         if byte & 0x10:
             high = byte & 0x03
             low = (byte & 0x0c) >> 2

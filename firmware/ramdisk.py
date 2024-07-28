@@ -42,13 +42,13 @@ class RamDisk:
         self.file = open(self.filename, 'r+b')
 
     def handle_command(self):
-        self.command = cpld.read_data(cpld.REG_RAMDISK_CONTROL)
+        self.command = cpld.read_reg(cpld.REG_RAMDISK_CONTROL)
         self.read_pointer = 0
         self.read_count = 0
         if self.command == Command.RESET:
             print("RAM-Disk RESET")
             self.command = None
-            cpld.write_data(cpld.REG_RAMDISK_DATA, 1)                  # 1 == 120K ram Disk
+            cpld.write_reg(cpld.REG_RAMDISK_DATA, 1)                  # 1 == 120K ram Disk
         elif self.command == Command.READ:
             self.read_count = 2
         elif self.command == Command.READB:
@@ -60,7 +60,7 @@ class RamDisk:
         elif self.command == Command.CKSUM:
             print("RAM-Disk CKSUM")
             self.command = None
-            cpld.write_data(cpld.REG_RAMDISK_DATA, self.cksum)
+            cpld.write_reg(cpld.REG_RAMDISK_DATA, self.cksum)
         else:
             self.command = None
 
@@ -75,40 +75,42 @@ class RamDisk:
             offset = self.get_sector_offset()
             print("RAM-Disk READ", offset)
             self.file.seek(offset)
-            cpld.write_data(cpld.REG_RAMDISK_DATA, 0)                 # status OK
+            cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                 # status OK
             self.file.readinto(self.file_buffer)
             for byte in self.file_buffer:
-                while cpld.read_irq_ramdisk_ibf() == 1:
-                    pass
-                cpld.write_data(cpld.REG_RAMDISK_DATA, byte)
+                while True:
+                    if not cpld.read_reg(cpld.REG_IRQ) & cpld.IRQ_RAMDISK_IBF:
+                        break
+                cpld.write_reg(cpld.REG_RAMDISK_DATA, byte)
         elif self.command == Command.READB:
             offset = self.get_byte_offset()
             print("RAM-Disk READB", offset)
             self.file.seek(offset)
             byte = self.file.read(1)
-            cpld.write_data(cpld.REG_RAMDISK_DATA, 0)                 # status OK
-            while cpld.read_irq_ramdisk_ibf() == 1:
-                pass
-            cpld.write_data(cpld.REG_RAMDISK_DATA, byte)
+            cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                 # status OK
+            while True:
+                if not cpld.read_reg(cpld.REG_IRQ) & cpld.IRQ_RAMDISK_IBF:
+                    break
+            cpld.write_reg(cpld.REG_RAMDISK_DATA, byte)
         elif self.command == Command.WRITE:
             offset = self.get_sector_offset()
             print("RAM-Disk WRITE", offset)
             self.file.seek(offset)
             self.file.write(self.px8_buffer[2:130])
-            cpld.write_data(cpld.REG_RAMDISK_DATA, 0)                 # status OK
+            cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                 # status OK
             self.pending_writes = True
         elif self.command == Command.WRITEB:
             offset = self.get_byte_offset()
             print("RAM-Disk WRITEB", offset)
             self.file.seek(offset)
             self.file.write(self.px8_buffer[3])
-            cpld.write_data(cpld.REG_RAMDISK_DATA, 0)                 # status OK
+            cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                 # status OK
             self.pending_writes = True
         else:
             print("don't know how to execute command", self.command)
 
     def handle_data(self):
-        byte = cpld.read_data(cpld.REG_RAMDISK_DATA)
+        byte = cpld.read_reg(cpld.REG_RAMDISK_DATA)
         if self.read_count == 0:
             print("unexpected data from host:", byte)
             return

@@ -44,13 +44,6 @@ NET "pico_addr[0]"        LOC = "30"; # Pico GP13
 NET "pico_addr[1]"        LOC = "32"; # Pico GP14
 NET "pico_addr[2]"        LOC = "33"; # Pico GP15
 
-# Register full signals to Pico
-NET "irq_tone_dialer"     LOC = "6"; # Pico GP16
-NET "irq_modem_control"   LOC = "7"; # Pico GP17
-NET "irq_ramdisk_command" LOC = "8"; # Pico GP18
-NET "irq_ramdisk_obf"     LOC = "9"; # Pico GP19
-NET "irq_ramdisk_ibf"     LOC = "41"; # Pico GP20
-
 # RX inverter
 NET "rx"                  LOC = "20";
 NET "rx_n"                LOC = "74";

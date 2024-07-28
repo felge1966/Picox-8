@@ -30,12 +30,6 @@ entity PicoX8 is
     rx                  : in    std_logic;
 
     -- Pico interface
-    -- IRQ signals
-    irq_tone_dialer     : out   std_logic;
-    irq_modem_control   : out   std_logic;
-    irq_ramdisk_command : out   std_logic;
-    irq_ramdisk_obf     : out   std_logic;
-    irq_ramdisk_ibf     : out   std_logic;
     -- Pico register access port
     pico_data           : inout std_logic_vector(7 downto 0);
     pico_addr           : in    std_logic_vector(2 downto 0);
@@ -70,14 +64,19 @@ architecture Behavioral of PicoX8 is
   constant PICO_RAMDISK_DATA    : std_logic_vector(2 downto 0) := "011";
   constant PICO_RAMDISK_CONTROL : std_logic_vector(2 downto 0) := "100";
   constant PICO_BAUDRATE        : std_logic_vector(2 downto 0) := "101";
+  constant PICO_IRQ             : std_logic_vector(2 downto 0) := "111";
+  signal irq_register           : std_logic_vector(7 downto 0);
   signal modem_tone_dialer      : std_logic_vector(7 downto 0);
   signal modem_control          : std_logic_vector(7 downto 0);
   signal modem_status           : std_logic_vector(7 downto 0);
   signal baudrate               : std_logic_vector(7 downto 0);
   signal ramdisk_data           : std_logic_vector(7 downto 0);
   signal ramdisk_command        : std_logic_vector(7 downto 0);
-  signal ramdisk_ibf            : std_logic;
-  signal ramdisk_obf            : std_logic;
+  signal irq_tone_dialer        : std_logic;
+  signal irq_modem_control      : std_logic;
+  signal irq_ramdisk_command    : std_logic;
+  signal irq_ramdisk_obf        : std_logic;
+  signal irq_ramdisk_ibf        : std_logic;
   signal data_out               : std_logic_vector(7 downto 0);
   signal oe                     : std_logic;
   signal pico_data_out          : std_logic_vector(7 downto 0);
@@ -96,8 +95,8 @@ begin
         baudrate            <= x"00";
         ramdisk_data        <= x"00";
         ramdisk_command     <= x"00";
-        ramdisk_ibf         <= '0';
-        ramdisk_obf         <= '0';
+        irq_ramdisk_ibf     <= '0';
+        irq_ramdisk_obf     <= '0';
         irq_tone_dialer     <= '0';
         irq_modem_control   <= '0';
         irq_ramdisk_command <= '0';
@@ -122,7 +121,7 @@ begin
                 oe <= '1';
               when PX8_RAMDISK_DATA =>
                 data_out <= ramdisk_data;
-                ramdisk_ibf <= '0';
+                irq_ramdisk_ibf <= '0';
                 oe <= '1';
 
                 rdd_d <= ramdisk_data;
@@ -130,10 +129,10 @@ begin
                 rdd_cd <= '1';
               when PX8_RAMDISK_CONTROL =>
                 led2_buf <= '0';
-                data_out <= (0 => ramdisk_ibf, 1 => ramdisk_obf, others => '0');
+                data_out <= (0 => irq_ramdisk_ibf, 1 => irq_ramdisk_obf, others => '0');
                 oe <= '1';
 
-                rdd_d <= (0 => ramdisk_ibf, 1 => ramdisk_obf, others => '0');
+                rdd_d <= (0 => irq_ramdisk_ibf, 1 => irq_ramdisk_obf, others => '0');
                 rdd_clk <= '1';
                 rdd_cd <= '0';
               when others =>
@@ -151,7 +150,7 @@ begin
                 baudrate <= data;
               when PX8_RAMDISK_DATA =>
                 ramdisk_data <= data;
-                ramdisk_obf <= '1';
+                irq_ramdisk_obf <= '1';
 
                 rdd_d <= data;
                 rdd_clk <= '1';
@@ -185,11 +184,13 @@ begin
                 pico_data_out <= baudrate;
               when PICO_RAMDISK_DATA =>
                 pico_data_out <= ramdisk_data;
-                ramdisk_obf <= '0';
+                irq_ramdisk_obf <= '0';
               when PICO_RAMDISK_CONTROL =>
                 pico_data_out <= ramdisk_command;
                 irq_ramdisk_command <= '0';
-                ramdisk_ibf <= '0';
+                irq_ramdisk_ibf <= '0';
+              when PICO_IRQ =>
+                pico_data_out <= irq_register;
               when others =>
                 pico_data_out <= x"00";
             end case;
@@ -200,7 +201,7 @@ begin
                 modem_status <= pico_data;
               when PICO_RAMDISK_DATA =>
                 ramdisk_data <= pico_data;
-                ramdisk_ibf <= '1';
+                irq_ramdisk_ibf <= '1';
               when others =>
                 null;
             end case;
@@ -216,15 +217,19 @@ begin
   -- RS232 RX on expansion bus needs to be inverted
   rx_n <= not rx;
 
-  -- RAM-Disk handshake signals
-  irq_ramdisk_obf <= ramdisk_obf;
-  irq_ramdisk_ibf <= ramdisk_ibf;
+  -- IRQ register
+  irq_register <= (0 => irq_tone_dialer,
+                   1 => irq_modem_control,
+                   2 => irq_ramdisk_command,
+                   3 => irq_ramdisk_obf,
+                   4 => irq_ramdisk_ibf,
+                   others => '0');
 
   led0 <= '0';
   led1 <= led1_buf;
-  led2 <= not ramdisk_obf;
-  led3 <= not ramdisk_ibf;
+  led2 <= not irq_ramdisk_obf;
+  led3 <= not irq_ramdisk_ibf;
 
-  rdd_obf <= ramdisk_obf;
+  rdd_obf <= irq_ramdisk_obf;
 
 end Behavioral;

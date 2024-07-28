@@ -24,20 +24,21 @@ STB_MASK   = 0b00111110_00000000_00000100_00000000
 READ_MASK  = 0b10000000_00000000_00000000_00000000
 WRITE_MASK = 0b00000000_11111111_00000010_00000000
 
-# IRQ pins
-PIN_IRQ_TONE_DIALER = Pin(16, Pin.IN, Pin.PULL_UP)
-PIN_IRQ_MODEM_CONTROL = Pin(17, Pin.IN, Pin.PULL_UP)
-PIN_IRQ_RAMDISK_COMMAND = Pin(18, Pin.IN, Pin.PULL_UP)
-PIN_IRQ_RAMDISK_OBF = Pin(19, Pin.IN, Pin.PULL_UP)
-PIN_IRQ_RAMDISK_IBF = Pin(20, Pin.IN, Pin.PULL_UP)
+# IRQ register bits
+IRQ_TONE_DIALER     = 0x01
+IRQ_MODEM_CONTROL   = 0x02
+IRQ_RAMDISK_COMMAND = 0x04
+IRQ_RAMDISK_OBF     = 0x08
+IRQ_RAMDISK_IBF     = 0x10
 
 # Register numbers
-REG_TONE_DIALER = 0
-REG_MODEM_CONTROL = 1
-REG_MODEM_STATUS = 2
-REG_RAMDISK_DATA = 3
+REG_TONE_DIALER     = 0
+REG_MODEM_CONTROL   = 1
+REG_MODEM_STATUS    = 2
+REG_RAMDISK_DATA    = 3
 REG_RAMDISK_CONTROL = 4
-REG_BAUDRATE = 5
+REG_BAUDRATE        = 5
+REG_IRQ             = 7
 
 # PIO program to communicate to the CPLD
 @rp2.asm_pio(out_shiftdir=PIO.SHIFT_RIGHT,
@@ -86,33 +87,10 @@ cpld_sm.active(1)
 
 
 # Initialize the state machine
-def write_data(address, data):
+def write_reg(address, data):
     cpld_sm.put((address << ADDR_BITS_POS) | STB_MASK | WRITE_MASK | data)
 
 
-def read_data(address):
+def read_reg(address):
     cpld_sm.put((address << ADDR_BITS_POS) | STB_MASK | READ_MASK)
     return cpld_sm.get()
-
-
-# Functions to read IRQ pin statuses
-def read_irq_tone_dialer():
-    return PIN_IRQ_TONE_DIALER.value()
-
-
-def read_irq_modem_control():
-    return PIN_IRQ_MODEM_CONTROL.value()
-
-
-def read_irq_ramdisk_command():
-    return PIN_IRQ_RAMDISK_COMMAND.value()
-
-
-def read_irq_ramdisk_obf():
-    return PIN_IRQ_RAMDISK_OBF.value()
-
-
-def read_irq_ramdisk_ibf():
-    return PIN_IRQ_RAMDISK_IBF.value()
-
-
