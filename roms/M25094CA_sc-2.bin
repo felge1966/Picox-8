@@ -1,0 +1,294 @@
+rformed  (in the "current direction")  after data is
+		      entered into a cell. 
+  P(rompt) ----------- Controls whether the prompt line is displayed.
+H Scope of Formats
+
+  E(ntry)----> Sets display format for a cell or group of cells.
+  R(ow)------> Sets display format for all cells in row without a cell format.
+  C(olumn)---> Sets display format (or width) for column. Affects cells with
+              no entry or row format.
+  G(lobal)---> Sets display format and column width for all cells and rows
+              without local formats.
+I Quit options.
+
+	Y(es)--> Exits SuperCalc.
+		This discards all worksheet data not /S(aved) on disk.
+
+	N(o)---> Return to the current worksheet.
+J Zap operation.
+
+	Y(es)--> Erases all data from worksheet, including global formats and
+		column widths.
+	N(o)---> Return to the current worksheet.
+Zap is equivalent to exiting SuperCalc and calling it again.
+K Window (split-screen) options:
+
+  H(orizontal)--> Split into two windows at current row.
+  V(ertical)----> Split at current column.
+  C(lear)-------> Erase split (return to single window).
+  S(ynchronize)-> Cause both windows to scroll simultaneously when moving
+                 parallel to split.
+  U(nsynch.)----> Cause only current window to scroll, regardless of direction.
+L FORMAT command.
+
+Enter one or more of following options:
+ I(nteger)-----> Display numbers rounded to a whole number.
+ $-------------> Display numbers with two digits after "." .
+ E(xponent)----> Display numbers in scientific notation.
+ G(eneral)-----> Display numbers as they "best fit" in cell.
+ *-------------> Display numbers as a string of stars.
+ R(ight)-------> Format numbers right-justified.
+ L(eft)--------> Format numbers left-justified.
+ T(ext)L(eft)--> Display text strings left-justified. (In this case long text
+                will continue to display in unoccupied adjacent cells.)
+ T(ext)R(ight)-> Display text strings right-justified.
+ D(efault)-----> Reset to G(eneral), R(ight), T(ext)L(eft).
+   
+ In addition, while formatting Global or Column, a column width of 0-127 may
+be specified.
+M Load workheet.
+
+LOAD worksheet from disk options:
+ A(ll)---> Loads entire worksheet and resets global, column and row formats,
+          column widths, display mode settings, etc. from saved worksheet.
+ P(art)--> Allows loading of any portion of saved worksheet into any portion
+          of current memory worksheet. Global flags  and  settings  are  not
+          affected.
+N OUTPUT report options:
+
+   D(isplay)---> Generates report formatted in rows and columns, essentially
+                like the interactive display.
+   C(ontents)--> Lists the  exact  contents ( text or formulas ) of occupied
+                cells, one per line.
+O SAVE worksheet on disk options:
+
+   A(ll)----> Text, Formulas and current values for the entire worksheet are
+             saved on disk.
+   V(alues)-> Only text and current values of formulas (for the entire work-
+             sheet) are saved.
+P Entry/Edit mode.
+ The first character determines whether you are entering a formula or a text
+string (label).   A quote  mark (")  starts a text string. An apostrophe (')
+starts a repeating text string. Any other character starts a formula.
+
+ While entering data, the arrow keys (which normally scroll around the work-
+sheet) become "editing" keys:
+
+	Left arrow  (or CTRL/S) --> Backspace one character
+	Right arrow (or CTRL/D) --> Move right one character
+	Up arrow    (or CTRL/E) --> Insert one blank
+	Down arrow  (or CTRL/X) --> Delete one character
+
+
+
+	CTRL/Z  -->  Clear out current entryline
+	BS	-->  Delete previous character
+	DEL	-->  Delete current character
+	INS     -->  Insert character before cursor
+Q Output destinations.
+
+  P(rinter)---> Allows you to create  printed  reports from  the  worksheet,
+               using  the setup codes originally  configured when  SuperCalc
+               was installed.
+  S(etup)-----> Print report (as "P"), but allows specifying special printer
+               setup codes, paper width or page length.
+  C(onsole)---> Allows you to preview the report on your terminal display.
+  D(isk)------> Outputs the report to a disk file for later use. 
+R Delete Options:
+
+  R(ow)-----> to delete an entire row from the worksheet.
+  C(olumn)--> to delete an entire column.
+  F(ile)----> to delete (forever) a file that currently exists on disk.
+S Arrange Options:
+
+ Sort order - Rows and Column are always sorted (regardless of Ascending or
+             Descending choice) in the following order of cell contents:
+
+    Text cells, Text Values, Data Values, Numeric Values, Blank cells
+
+ Ascending - sorts the range in ascending order
+   (space; symbols in ASCII order; text a,A,...,z,Z; numbers 0,1,...,9)
+ Descending - sorts the range in descending order
+   (numbers 9-0; text A,z,...,A,a; symbols in reverse ASCII order; space)
+ A(djust)?    Y(es) -- Adjust cell references after the sort.
+              N(o)  -- Leave all cell references unchanged.
+T H(micro cassette) Options:
+
+
+	M(ount)----> Mount the MICRO CASSETTE.
+	R(emove)---> Remove the MICRO CASSETTE.
+U Join Options:
+
+  You can transmit and receive files -- not limited only SuperCalc files --
+using the RS-232C port.
+	S(end)-----> Transmit files to another computer.
+	R(eceive)--> Receive files from another computer.
+!      Notes:
+ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿrranging...  è ï_ SAscending, \`Descending, a`€ c`` SY q`N v`€ ÜÜ:1S!3S¾ 25S¯:2S!4S¾ 	26S>2!SÉ!¢`ÃW  range must be partial column or row :!Sş  ?:2S2gb:5S_:2S2ib:4S!gb4¾8dVÍsa8æ!ibVÍ”aÜ¢a8ÚÕÍ×aÑ8Ó!ib4:gb¾ æÇ:1S2fb:6SW:1S2hb:3S!fb4¾8%^Ísa8æ!hb^Í”aÜ¾a8ÚÕÍ×aÑ8Ó!hb4:fb¾ æÇÍk#Í:#SşÈÃ)ÕÍ+ÑØ~æÀ(ÕÍo5#Ñ¯É##>ÉÍ[aØ2jb·Õ 
+lb
+Í;HÑÉjP~·(ö#÷Í[aØ"vb2kbÉñ?Ğ:gbW:ibG!r^"¨Y!_r#pÍ_[7Éñ?Ğ:fb_:hbO!j^"¨Y!_s#qÍ²Z7É:kbG:jb¸ ··È:!Sş (µÏ lb*vbÍ™=È:ÍbÈ4!jPë*vb~G¸ ·È#ôOxÍLbWyÍLbºÀş xÍ‹*WyÍ‹*ºÀx¹Éy¸Éõ:!Sş (:"Sş Â»añĞÃ¾a!xb¾8##ù#~É:"Sş ÂŸañĞÃ¢a      ÏÏÏÏÏÏÏÏÏÏ    !0:	A[a{€ÿ                       €:!SGş():"S2˜xş ÂÁYÍ·Z: Sş (ş(7ÉÍx[Í'[Ã):#S2˜:"Sş  &?.ş"3S!  "1Sëş(7É*5Së*1Sz”W{•_ !"Lx±('ÍÚ-õÕCNÍHÑ(:"Sş(ñwõÕDNÍHÑ(#ñÕ!CN>¾0ÍğJ!Õ ÍW ·ÉÕ:"Sş  >:N· !
+NKÍ;H!Næş(ê!?NKÍ;H!'NwKÍ;HÍÂÍÁÍÂÍÁ:BN· >2BN*€K"–ÍÑÍ+\*–"€KÍÃŸÍ‰_*€K"*a!V_")`:5SO:1S_:3S»8K:6SG:2SW:4Sº81Í+0!  "n(cj"€a:˜ş 	!B_¯2©Q!V_")``iÅÍ^ÁÉÅÕYÍ=ÑÁ¯·**a"€KÉ*€K"*a:2SG:4SO*7Së*5Sx¹0Í‰_Åå:1Sgh"€K"€aáåÕÍ\Ñá$ÁŞ:5S_ÕÍ=Ñ:7S» ô**a"€K·É*€K"*a:1SG:3SO*7Së*5Sx¹0$Í‰_Åå:2So`"€K"€aáåÕÅÍ\Á]Í=Ñá,ÁØ**a"€K·Éå!`:!`·(	5 ¯2!`4áÉå! `:"`·(	5 ¯2"`4áÉåÍ
++õ"n(:˜ş 	¯2©Q!B_!V_")`ñáÉÍê[ØÍ^}»È,ÍÔ[ôÍê[ØÍ^|ºÈ$Í¾[ô:"Sş ÕÍ‰_ÑÍÚ-ØgÍÚ-ØoÍÚ-ØşÈGæğ2 )xæG:CN· x<G: )æğ°2 )ÍÚ-2]ÕëÍ¨*ë> 0<2
+]+2
+]}lg"€a}‚o|ƒg"€KxÅÍ (Á0!
+]4bk+"n(:]x<ÖOy·(ÍÚ-G:
+]· xì:
+]· >:CN·Ì]:˜ş(0ş 	¯2©Q!B_!V_")`*n(~æ õ~æßwÍñ*ëÍ^Íñ*Í+8ñ¶wÑÃ7\ÏÏ*n(å~æÀ(/æ€ )‘5å>Í—FÍŠE~á8· ~öw##åT]>
+Í—FÍWHáxÍ—F~#· úxæGá~æğ°wÉåÕÅ :O· :ù· :VÖŞ‘’¸_x8¯2^W{‚2^Í‡#>Íã':ù·Ä†'ÁÅ*l(:^ _x“OÍè "‚aåÍ'áÁÅÍè åÍ†'á:^OÍè *€aU\!daÍò,ÍÎ":·Äğ'XaÍïIjaÍïIÁ*‚aÍè taÍïIÍÆ&æßşY(şN ó·ÑáÉ!©Q4~Í—F+å*‚aëás#r7ç  ! Ã¢>ÿ2¾"Õå}lg"€K*n(|µ  ÑÍ$)8àÕ^#Vz³Ê_ë~æ Â_¯Í/Ã_Õå~GæÀ(Exæ @:˜ş 5~æ ö@ö2 )ë!jPåÍÛ?‚P¯!R"l(ÑëÍS-xÆæxÁÁÃÛ^
+ ##"l(áÑ~æğ2 )æ€('å :˜ş(Í¸_!êO"l(ÍÂ?xÆæxá"l(á~æÍ (8!*n(#~#: )æÀ(: )æ 
+Í;H*l(ÍWH:˜ş !_")`Íb&áÑÉÕ:©QW:+`ºÒ>_!ªQ‡Í—F^#V*#`ÍHÂ>_Ñ:+`<2+`ÃV_ÑÃ`*#`:'`•O}*%`•GÍ^]Ò`:`G:!`·z(€Ú,`ş?Ò,`W: `G:"`·{(€Ú,`şşÒ,`_Ã`Åå!  "!`á:2SG:6S02!`/<2`:1SG:5S02"`/<2 `ÁÉ¯2+`ÕÅêO"%`ÃÉ_#~şAÚÔ_ş[Úò_ş ÂÇ_{!êO•<şt8å>sÍ—F6 á>sÁÑÉÕ"#`Í‘,8#"'`*)`éáÍò,ë*'`¼Ñ*#`~şA8¾ş[0º#ò        Ñ!Æ6Í;H*'`ÃÉ_Replicating.. Copying.. :!S!\`Ã|8Û`b`Û`;`Íß"Íş%:1S!3S¾ K:2S!4S¾ 3:5S!7S¾ *Í‚(:6Sg:8S—‚WÍ÷`>Í‚(:5So:7S•ƒ_Í÷`> 2 SÉ:6S!8S¾(á!„aÃW :2S!4S¾!½aÂW :5S!7S¾(±!¢aÃW I`Íß"Íş%Í‚(Å#N#F#~¹ ,#~¸ 'Á:6Sg>?”g:5So>ş•oz¸0PG¼0{¹0YO‘½0	·ÉÁ!,aÃW !FaÃW    Copy "TO" must be cell.  Copy won't fit. Source cell       . Adjust   (Y or N) ? ÏÏÏÏ"TO" must be partial column. "TO" must be partial row. "FROM" can't be block.                                                                                  ÍfJ2ü^Æ@2†Z>Í*(Í@(:äş  Íõ'¦ZÍïIÍõ'ÀZÍïI>2äÍîYõÍ:(> Í*(ñ7É ÿ Í 2bZÍ¤\¯2ª\2Y]!×\"Õ\>2u]ˆZ:TN· 
+!˜ZÍ;H!SNÍ|_@Íõ'†ZÍïI@Íõ'ˆZÍïI  Íõ'ÍÆ&Í‹*şSÊx]şDÊ³[şC(
+ş(ş äÉ @Íõ'ÍÆ&Í‹*şA8ğşQòcZÖ@2ü^Æ@2†ZÃüYÉ                  NONE          *** Directory Display ***  OPTIONS:      C(hoose) alternate disk drive.     work disk is  
+               D(isk) directory, All files.       work file is                
+               S(uperCalc) format files only.
+
+ 'STOP' to return to worksheet. >Í(Í¤\!Íõ'Ã@(Í¢[]ÍïI>ÿ2t]!€ ü^Í+Jı^!Z]Í;H:ü^OÍXJü^Í şÿÂò[=]ÍïIÊ\õ!t]u]~<wG¸Â\¯w!«\"Õ\Íj\:Y]ş(ş ñIñ‡‡‡‡‡!€  O	F:bZ¸  #åf]Í<_á Ë~ > >*2r]e]ÍïIü^Í şÿÂò[!×\"Õ\*Í:(ÃîY:ª\<2ª\G:U¸0Í“\Í¤\>Í(!Íõ'ÍáI·ÉÍ“\Ñí[Õ\ÍïIÍnIÍ‹*2Y]É>2ª\É 
+More...('RETURN' to continue or 'STOP')   
+End of report...Type any key to return to menu Directory of files on Disk:          * : Read Only
+ 
+NO files found on drive
+  ??????????? 12345678.123      Í¢[^ÍïI!€ ü^Í+Jı^!!_Í;H:ü^OÍXJü^Í şÿ 	Ü^ÍïIÃ\ÍS^!)__Í;H!jOå,_Í;H,_ÍïIı^áåÍ;Hü^Í ü^!	 Ë~ > >*29_9_ÍïIü^Í > 2_!” 6 #6 > 2À € ÍïIá 	: _=2 _úG^å!«\"Õ\Íj\á:Y]şÊd\şÊd\ÃÂ]!×\"Õ\Í“\Ãd\õ> 2 _ñjO‡‡‡‡‡!€  O	F:bZ¸ #Í;HåÕü^Í ÑáşÿÈõ: _<2 _ñÍFilename      Creation Comment    SuperCalc format files    * : Read Only
+ 
+NO files found on diskette.
+ ÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏ ????????CAL12345678.CAL    yÊo_ş >.	~·(%ş (#æä#~·((	ş (òÕ#>  øÉy€Gô ~Æ@>:#´                             €	Îa`iPYÃJ<Íá6Å~·ú‰; áÃc;Ö@õÅa> Æ@#Ín;!Åa/Z¼aÍJ<!Åa¼a×aÍĞ<×a!¼aBKÍÛ;!/Z×aÎaÍJ<Îa!¼a¾ # ÷ñÑ!Îa†#Ãn;!Îa¼aÍl;ÃáY@P       A1b'v`ƒ€A#XP’™@FÍá6ÅÅaÍl;!×aÍc;!Åa~·Ê‰;ú‰;ÖAA0/<Áş
+8 Ş
+0ûÆ
+‡‡‡‡³· W!×ar#w>A2Åa!×aAZ×aÍJ<!Åaö8Í™=ÂµZÑ!×aÃl;!Åa8ZÍ™=8!Åa8ZDMÍJ<×a!¦[BKÍÛ;:ÆaæÖG‡‡‡€![õEox•o|Ş gÅaBKÍJ<ñ!¯[Í—F×aBKÍÛ;!Åaö8¼aÍ
+<Åa!ö8ÎaÍÛ;!¼aÎaDMÍĞ<!¼aT]ÅaÍJ<!K[ê8Í™`Á×a!ÎaÃÛ;@Rcx”sh@vGˆ#R”@3333333@8F8F8@@""""""""@(W(W&W@@       @fffffffgA         ÁQ)%FIp#ARv)hISgAs–wbtAt€’#„%Aq€!v‘A 0 T"eA!@acIbqA"Q)˜`d•Íá6ÅÍMZÁPY!ş[ÃJ<@CB”H%Õ×aÅÍl;á"<\ë!ö8Íl;ñ·õ0*<\ëBK!×aÍJ<ñ·Èõ!×aT]DMÍJ<Ş  Íá6~· PY!ö8Ãl;ÅÅaÍl;!Åa~æwÖAõ87åéaÍ³=!éa€EÍl;ÍI>z·ÿ Sàa!7]Í\áåDMéaÍ
+<á~· ö8¼aÍl;ö8!Ó\Í™`Í¨YÍ¨YÎañ8	Îa!àaÍJ<Ñ·úÈ\!ÎaÃl;BKÎa!ö8ÃĞ<2Yrˆ€„uST4&(W)#V6Q"ƒ‘iB77„BP	’9P–:3„ ˆˆ‰;83333='`Afffg>&ffffg?1%      @%        A'((EEÍá6ÅÅaÍl;!Åa~Gæwxæ€2×a#>ÅaÍå=!ä]ÅaÍ™=Úz]!Åa#>DMÍ
+<<!5>ÅaÍ™=8!×a>€®w!Åa5>DMÍ
+<!,>ÅaÍ™=8!Åa5>DMÍ
+<!×a>€®w!Åaí]¼aÍJ<!¼a¼aÅaÍJ<ê8!ö]Í™`Ñ!Îa:×aÍJaÃl;AG8‰€8F@cfw#gX³CwTg17†5`f“W1bP·fˆQ	 9V’)!–yf»5˜„25!!=AG‡6¾FuA51‡?yi&&$ag&ÀdYd	u$sApyc&yH˜ Íá6Å#>Íå=áå>Í—F~æşwÁÅPY!,>ÍÛ;áDMÃC]Íá6ÅåàaÍC]áéaÍT^!àaéaÁÃĞ<Íá6¯Íá6~Åõ7Í¯^ñÁæ€ÈPY!5>Ã
+<ÅõåT]àaÍJ<éa!ö8àaÍ
+<àa!éaÍµYáàañéa8ë#~·(+ëÍĞ<!éaÁáåë~õ!,>Íl;ñæ€á¶wÉÍá6~· `iÃc;Åæ€õ¼aÍl;!¼a~æw!¼aö8Í™=0ñö@õ!ö8¼a¼aÍĞ<!¼a#`Í™=04ñö õ!¼a,`ÅaÍJ<!Åaö8ÅaÍ
+<¼a!,`¼aÍÛ;!Åa¼a¼aÍĞ<!¼a¼aÅaÍJ<!ö8ÅaÅaÍĞ<Åa!~`ÎaÍÛ;!Îa‡`ÎaÍJ<!5`Z`Õå!Åa×aÍÛ;!×aÎa×aÍ
+<áå×aÎaÍĞ<Ñá	 	ë	~· ÒÎa!ö8ÎaÍÛ;!Îa¼aÎaÍJ<ñõæ (`!ÎaÎaÍÛ;ñõæ@(!,>ÎaÎaÍ
+<ñæ€!ÎaÍJaÑ!ÎaÃl;@&yI$1%A2Vˆy?a‘PˆT?d3—Fg0€?hW(W(WÀ33333333 @P"bD48‘@@PBsPBsPC@Q@`       Â@       ½EA4’’@R5˜wU˜)ˆÕå!ÎaÍc;áåÎaÎaÍÛ;Ñ!	 ~·(å!ÎaÅaÎaÍJ<İ!¼aÎaÎaÍJ<áÎaÎaÃÛ;Íø2*¦5å*¨5"¦5á"¨5Í3Í4*´5ö8DMÍÛ;Í4*´5ë!ö8BKÍĞ<Í4!€E
+Íe;*ª5ëÍ5#€E€EÍÛ;Í4*´5€E€EÍJ<Í4Ío30Û*´5ë!€E
+Ã;H45È®wÉÍá6åéaÍ³=áåéaÍ™=>€ áåë!jPÍÛ?:{Pæ2óa¯õÍá6~·Ê¹aæ€2òaG®wñ 2Ù;Í!7ÍJZÍ!7Íá6ÑÅÍJ<Í!7Í>\á:òa·È:óa·È>€¶wÉñáÉÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏ  *a/úÿ~ş(ÑÃ1Íá6~æ(8şC0şA0ÑÉõ#ñ~("şe8+~·ú(bÑÉõÍá6å;Wæ_zæğW‚ƒæğ+O~·yúNb/<2¢bÆ@õÍá6å~æ_:¢b·W{òfb’ş@0Ñå!ê8Íl;áñ+{’şP0öÑñoÍNCÍ4CÅáÕÁ~Õõ:¢bWñõ’wÍ³=ñáw#~+· wÉ   	 $`> 2œZ}·7ÈåÍøYáÍÚY7:œZş((ZÍêY7õÍ@(>Í(> Í*(ñÉEÃdZ§È/<…o|?Ş gÉÕÍõ'ÑÍïIÃ#>Í*(Ã:(More...('RETURN' to continue or 'STOP') End of HELP...Type any key to return to worksheet SuperCalc x2Z	Íõ'!	"j(ZZÍïIZÍïI:›Nÿ[!#\Í
+J<(ÍÊZ0±ZÍïIÉ *    AnswerKey (tm) 
+SC.HLP not installed.
+ Í[:Z¾(Í[8#òÍ[8 ñ#åÍ[Ñõ6åÍ.[áñ0:œZş(Í[0ä·>ÿ2#\É#~ş7Èş öÉ#`ÍH7À!#\ÿ[Í”J·!#`6!#\É:j(ş8!Õ ZÍêYÑ2œZşÈÕ>Í(	Íõ'!	"j(Ñş
+ Íu[!j(şÈÕÍáI*j(&,"j(Ñ¹*¨YëÕÍ‡[ÑåÅÍïIÁÑxÉÕ:k(G:V<_ JB~Gş(<#ş (0åÆßo>[Î g~á·('=(yÆæøOQ"İ[ãp#ãy»8ÎKz·(y’JáÍŞYå*İ[Ñ> Éİ[     SC      HLPÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏÏ                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+ 	ÙY USend, ÏYReceive, ÔY€ï
+
+ìY ÁYÁYS(end),R(eceive)? Éís)b1kbCaÍ !©öÜ_ í°ë6ÿ:!Sş  Í)ZÍP[Í€]·í{)bõÍk#ÍñÉÍ_^ÚE[Í•]şÒE[!`"Èa‡‡‡‡‡O !Da	í[Èa í°íSÈa:Ãa<2ÃaşÒ¶]Í•]ş8Ò!`"ÈaÍf]ÚJ[
+RÍV_· èaÍ²]RÍÅ]Íå](öÍ¼]şS ïGÍÅ]*ÈaŸ` í°"ÈaÍX]Í•]<ÊE[ÍÅ]Í¼]ş ô!Ÿ`^ÍÅ]Í¼]» å#óÍÅ]Í¼]ş	 ÖCaÍ Í•]· :ÍÅ]Í¼]şP ôbÍ²]!Ÿ`Í(]!Ca €^ÍÅ]{©O#öYÍÅ]Í¼]şB(ÌşG(¸óÍÅ]Í‡]8!Ãa5ÂŸZÍÅ]·ÉÛaÍaÃ^Í_^8ğÍ ! ^Í !`ê_ í°:Äa2ÅaÍf]Ú"]
+ ÍV_· ûaÍ²]Íå](ûÍ¼]şR ôSÍÅ]Í¼]şG ùÍ¼]ş ·É`!ê_ í°õ:Åa2Äañş(XÍÅ]ÙÍÅ]!÷_Í¼]ş 8èw_ÍÅ]#ñÍ¼]ş Ù!Ÿ`÷_ :Äa·(~ş? w#ï:Äa·(%!©`Í\Í\~+ş  øÉ~+ş  #6$+ôÉÍX]¯2ÇaÍ•]<(!Ça6!§`ÿ_~6$#øÍ“]Í•]<ÊE[>ÿ2Æa	ÍÅ]bÍ²]!÷_Í(]!Ca €Í¼]ş(ş(ENÍÅ]îPÍÅ]Í¼]w©O# öÍ¼]©(BÍÅ]¿CaÍ Í•]·(
+Í‡]¯2ÆaÃE[GÍÅ]Ãh\Í‡]ÚE[!`ö_	 í°¯2`2`:Ça·(ö_Í şÿ(!ö_®` í°Í•]<(¯2ÆaÃ¢[ÛaÍ²]Í“]¯2ÆaÍ€]Ã^ÍaÃ^L]~æş (xş >.#ë> L]ÍïIÉ            !ª`«`6  í°É!Ø_á_	 í°!á_Í¨] ·É7ü Í¨]·ÉÍ•]7şÿ(·É`ÕåÍ áÑÉÅÍ˜]ÁÉQ å* ãÉÍä"ÉÍaÃ^Íå](ûÍ ^ÉÕˆÍ¢_Í1^ z³ óÍ1^ Í¢_öÑÍC^ÉÍ¢_åÕÅÍ¨] cætÍa 0!á_Í¨]·ÁÑáÉ:Æa·Ä‡]¯2ÆaÕÍ€]Ñë+í{)b7ÃW åÕÅP!á_Í¨] +ÁÑáÉåÕÅ@!á_Í¨] ÁÑá·ÉåÕÅ`K!á_Í¨] ÁÑáÉÃ^ş ùÃÀ_!`Ÿ`6  í°!Êa§` í°¯2ª`2­`2¾`!x~ÍM_w#ø!x:yş:>@ ~##:xş@ÊJ_Ö@ÚJ_ş	ÒJ_2`Ÿ`~ş08ş:ÚJ_~ş*(,ş. xşÊJ_7· xş b:!Sş (iY#Ù~·(Pş.(XÅ>?úÁ#~ş.(·(8õ#ß#§`~Oæ€(xş 0yş.(+ş*(
+·(#äÅ>?úÁ#ı~· :Ÿ`Ö 2Äa¯2Ãa·É7üşaØş{Ğæ_ÉÕåÍ¢_!äôËv(Ë¶x 5yşÿ ÿÅÍ ]Á·(ß"·(RÍÅ]Íå](ĞÍ¼]şS ÉÍå](ÂÍ¼]şR »>ÿáÑÉõÅÕå:ñ· ÍcI áÑÁñÉş(ş(ñÍ€]:Æa·(Í‡]:!SşÌ“]·ÃZÂ`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             `CALRS-232C ERROR File failure Receiver not Ready Transmitter not Ready Sending..  Receiving..                                                                      ver not Ready Transmitter not Ready Sending..  Receivingÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ+HotFlash notes.
+
+*      General operation.
+
+A      Initial character meanings.
+	/  -->  To enter a command.
+	"  -->  Starts Text cells.
+	'  -->  Starts Repeating Text cells.
+	=  -->  To specify a cell to jump to.
+	!  -->  To force recalculation.
+	;  -->  To change screen window.
+ Four arrow keys scroll around the cells.
+ Four CTRL+key  combinations also scroll.
+
+            CTRL/E    CTRL/X   CTRL/S   CTRL/D
+        ==>   UP       DOWN     LEFT     RIGHT
+
+ and CTRL+arrow-keys scroll 5 times around the cells.
+	CTRL/Z    -->  Clear out current entry line
+	BS        -->  Delete previous character.
+	DEL       -->  Delete current character.
+	INS       -->  Insert character before cursor.
+	CTRL/HELP -->  Change the screen to SYSTEM DISPLAY.
+	CTRL/PF5  -->  Print out the current screen.
+
+	HELP or ? -->  Show you what the prompt mean or what command
+		      options are available.
+Any other character starts Formula cells.
+B     
+ A file name is from 1 to 8 letters and/or optionally preceded by a device
+(disk) prefix.  This prefix is a single letter followed by a colon (:).
+   Examples:   BALANCE,  Exempt,  B:Feb24,  B:GROUP.XQT
+
+A <return> allows current file list selection.
+C      Range designators.
+	A "range" is a row, column, cell or block.
+	A "row" is a number from 1 through 254.
+	A "column" is a letter (pair) from A through BK.
+	A "cell" is a column followed by a row, for example: 'J10'
+	A "block" is two cells, separated by a colon (:).
+
+
+ An empty range (entering just "return") means the current cell, row or column.
+ "ALL" means the range A1:<Last Col/Row>.
+ Entering "ESC"  allows the arrow keys (or CTRL S/E/D/X keys) to be used to
+"point" to a desired cell.
+D  slash commands :
+
+A(rrange)---> Sorts cells in ascending or descending order.
+B(lank)-----> Removes contents of cells.
+C(opy)------> Copies contents of cells. 
+D(elete)----> Deletes entire row or column.
+E(dit)------> Allows editing the contents of a cell.
+F(ormat)----> Change display format of cells, rows, or entire worksheet.
+G(lobal)----> Change global display or calculation options.
+H(drive H)--> Control the MICRO CASSETTE.
+I(nsert)----> Create new row or column.
+J(oin)------> Transmitting and Receiving files using the RS-232C port.
+L(oad)------> Read worksheet (or portion) from disk.
+M(ove)------> Swap rows or columns.
+O(utput)----> Display contents or values of cells on printer, console or disk.
+P(rotect)---> Prevent future alteration of cells.
+Q(uit)------> Exit SuperCalc.
+R(eplicate)-> Reproduce partial rows or columns.
+S(ave)------> Write worksheet to disk.
+T(itle)-----> Lock first rows or columns against scrolling.
+U(nprotect)-> Allow alteration of protected cells.
+W(indow)----> Split or unsplit the screen display.
+X(eXecute)--> Accepts commands and data from an .XQT file.
+Z(ap)-------> Clear worksheet and all settings.
+E Formula adjustment options.
+
+Determines how cell references in formulas are adjusted for their new positions
+	N(o adjust)----> Leave all cell references (like J10) unchanged.
+	A(sk)----------> Gives you the options to change or leave each cell
+			reference individually.
+	V(alues)-------> Only move cell values, no adjusment is pertinent.
+ 
+ If no option specified (back up and type <return> instead of <,>) all cell
+references are modified.  
+F Title Lock.
+
+
+   Tells SuperCalc to "lock" the leftmost columns and/or uppermost rows so
+  that they are never scrolled off the screen (or video window). 
+
+
+Options:
+	H(orizontal)--> Lock current row and all rows above it.
+	V(ertical)----> Lock current column and all those to the left.
+	B(oth)--------> Simultaneously lock H and V.
+	C(lear)-------> Erase any title locks.
+G GLOBAL command options:
+These options affect calculation or display attributes.
+
+R(ow-wise) ------ Specifies that recalculation be done across the rows,
+		 that is, all of Row 1 is calculated, then all of Row 2, etc.
+C(olumn-wise) --- Calculation is  down  the columns, that is all of Column A,
+		 then all of Column B, etc.
+A(utomatic Recalculation) -- The  entire  worksheet  is  recalculated  after
+			    numbers or formulas are entered.  
+M(anual Recalculation) ----- In this mode, the worksheet is only recalculated
+			    when you enter "!".
+
+ The following options are "toggles".
+If the option is already on, respecifying it turns off and vice versa.
+
+  T(ab) -------------- In Tab mode, advancing between cells  skips all empty
+		      or protected cells.
+  B(orders) ---------- Controls  whether  the  row number and  column letter
+		      borders are displayed.
+  F(ormula Display) -- In Formula Display mode, the textual contents (rather
+		      than current values) are displayed.
+
+  N(ext) ------------- This  toggle  controls  whether an "auto-advance"  is
+		      pe
