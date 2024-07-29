@@ -36,9 +36,9 @@ class CommandProcessor:
 
 
   def say(self, s):
-    self.terminal.write(s)
-    self.terminal.write("\r\n")
-
+    result = self.terminal.write(f'{s}\r\n')
+    print(f'say {s} => {result}')
+    
 
   def cmd__help(self, args):
     self.say("""\
@@ -61,7 +61,7 @@ quit                                   Exit configuration""")
     self.say(f'Free memory: {gc.mem_free()}')
     self.say(f'WiFi status: {wifi.status()}')
     mounted = 'mounted' if storage.sdcard_mounted() else 'not mounted'
-    self.say(f'SD-Card    : {mounted}')
+    self.say(f'SD-Card    : {ramdisk.instance.get_file()}')
 
 
   def cmd_set_wifi(self, args):
@@ -122,11 +122,11 @@ quit                                   Exit configuration""")
     if not storage.mount_sdcard():
       self.say('No SD-Card found')
       return
-    files = uos.listdir(storage.SDCARD_DIR)
+    files = storage.listdir()
     self.say(f'Name                 Size')
     self.say(f'-------------------------------')
     for name in sorted(files):
-      size = uos.stat(f'{storage.SDCARD_DIR}/{name}')[6]
+      size = storage.file_size(name)
       self.say(f'{name:<20} {size}')
 
 
@@ -134,22 +134,15 @@ quit                                   Exit configuration""")
     if len(args) != 1:
       self.say('Missing filename argument to "set ramdisk", try "help"')
       return
-    path = f'{storage.SDCARD_DIR}/{args[0]}'
-    try:
-      size = uos.stat(path)[6]
-    except OSError as e:
-      if e.errno == errno.ENOENT:
-        size = None
-      else:
-        self.say(f'stat() error on {path}: {e}')
-        return
-    if size == None:
-      self.say(f'File {path} not found')
+    name = args[0]
+    if not storage.exists(name):
+      self.say(f'File {name} not found')
       return
-    if size != ramdisk.IMAGE_SIZE:
-      self.say(f'File {path} has an unexpected size, need {ramdisk.IMAGE_SIZE} bytes in image')
+    if not ramdisk.instance.valid_file(name):
+      self.say(f'File {name} is not a valid RAM-Disk image file')
       return
-    config.set('ramdisk', path)
+    ramdisk.instance.set_file(name)
+    self.say(f'RAM-Disk file {name} mounted')
 
 
   def cmd__set(self, args):

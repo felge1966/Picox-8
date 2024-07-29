@@ -1,8 +1,14 @@
 import cpld
 import time
-import config
+import storage
+import json
 
-IMAGE_SIZE     = 122880          # size of a ramdisk image
+instance = None
+
+CONFIG_FILE    = 'picox-8.config.json'
+DEFAULT_FILE   = 'default-ramdisk.dsk'
+
+IMAGE_KB       = 120             # size of a ramdisk image
 FLUSH_INTERVAL = 15000           # how often to flush ramdisk to flash
 
 class Command:
@@ -26,7 +32,10 @@ class Command:
 
 class RamDisk:
     def __init__(self):
-        self.filename = config.get("ramdisk", "/ramdisk.dsk")
+        global instance
+        if instance:
+            print('Warning: RamDisk instance already exists')
+        instance = self
         self.command = None
         self.read_count = None
         self.read_pointer = None
@@ -36,12 +45,54 @@ class RamDisk:
         self.pending_writes = False
         self.last_flush = time.ticks_ms()
         self.file = None
+        self.read_config()
         self.reopen_file()
+
+    def read_config(self):
+        if storage.exists(CONFIG_FILE):
+            self.config = json.loads(storage.slurp(CONFIG_FILE))
+        else:
+            self.init_storage()
+
+    def write_config(self):
+        storage.spit(CONFIG_FILE, json.dumps(self.config))
+        print(f'RAM-Disk configuration file {CONFIG_FILE} saved')
+
+    def init_storage(self):
+        self.config = { 'ramdisk': DEFAULT_FILE }
+        name = self.config['ramdisk']
+        if not storage.exists(name):
+            buf = bytearray(1024)
+            with open(storage.path(name), 'wb') as f:
+                for i in range(IMAGE_KB):
+                    f.write(buf)
+            print(f'RAM-Disk file {name} initialized')
+        self.write_config()
 
     def reopen_file(self):
         if self.file != None:
-            self.file.close()
-        self.file = open(self.filename, 'r+b')
+            try:
+                self.file.close()
+            except OSError as e:
+                print(f'Error {e} closing file')
+        name = self.config['ramdisk']
+        self.file = open(storage.path(name), 'r+b')
+        print(f'RAM-Disk file {name} mounted')
+
+    def valid_file(self, name):
+        size = storage.file_size(name)
+        return size == IMAGE_KB * 1024
+
+    def set_file(self, name):
+        if not self.valid_file(name):
+            print(f'Invalid RAM-Disk image file {name}')
+            return
+        self.config['ramdisk'] = name
+        self.write_config()
+        self.reopen_file()
+
+    def get_file(self):
+        return self.config['ramdisk']
 
     def handle_command(self):
         self.command = cpld.read_reg(cpld.REG_RAMDISK_CONTROL)
@@ -133,3 +184,4 @@ class RamDisk:
         if now < self.last_flush or now > self.last_flush + FLUSH_INTERVAL:
             self.flush_pending_writes()
             self.last_flush = now
+

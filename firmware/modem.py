@@ -10,6 +10,8 @@ from command_processor import CommandProcessor
 import wifi
 import config
 
+instance = None
+
 TICK_MS = 10
 TICKS_PER_SECOND = 1000 / TICK_MS
 
@@ -183,6 +185,10 @@ class TonePlayer:
 
 class Modem:
     def __init__(self):
+        global instance
+        if instance:
+            print('Warning: Modem instance already exists')
+        instance = self
         self.baud = 4800
         self.uart = machine.UART(0, baudrate=self.baud, tx=machine.Pin(0), rx=machine.Pin(1))
         self.socket = None
@@ -361,6 +367,7 @@ class Modem:
         elif self.state == State.DRAIN_UART:
             if event == Event.TICK:
                 if self.uart.txdone():
+                    print('UART tx done, resetting modem')
                     self.reset()
 
 
