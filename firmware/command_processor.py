@@ -36,9 +36,7 @@ class CommandProcessor:
 
 
   def say(self, s):
-    result = self.terminal.write(f'{s}\r\n')
-    print(f'say {s} => {result}')
-    
+    self.terminal.write(f'{s}\r\n')
 
   def cmd__help(self, args):
     self.say("""\
