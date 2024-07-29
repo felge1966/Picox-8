@@ -1,8 +1,11 @@
 import sys
 import struct
 import os
+import subprocess
+from tempfile import NamedTemporaryFile
+from pathlib import Path
 
-def decode_capacity(byte):
+def decode_capacity(capacity_byte):
     capacity_dict = {
         0x08: "single 8 kByte ROM",
         0x88: "double 8 kByte ROMs",
@@ -11,9 +14,20 @@ def decode_capacity(byte):
         0x20: "single 32 kByte ROM",
         0xA0: "double ROMs, first part 32 kByte"
     }
-    return capacity_dict.get(byte, "Unknown capacity")
+    return capacity_dict.get(capacity_byte, "Unknown capacity")
 
-def decode_rom_header(filename):
+def capacity_kb(capacity_byte):
+    capacity_dict = {
+        0x08: 8,
+        0x88: 8,
+        0x10: 16,
+        0x90: 16,
+        0x20: 32,
+        0xA0: 16
+    }
+    return capacity_dict.get(capacity_byte, "Unknown capacity")
+
+def decode_rom_header(filename, as_format_code=False):
     file_size = os.path.getsize(filename)
     offset = 0x4000 if file_size == 32768 else 0x00
 
@@ -70,11 +84,34 @@ def decode_rom_header(filename):
     print(f"Number of Directory Entries: {num_directory_entries}")
     print(f"Version Number: {version_number}")
     print(f"ROM Production Date: {rom_production_date_str}")
+    format_code = f'px8rom{capacity_kb(capacity_byte)}d{num_directory_entries}'
+    print(f"cpmtools format code: px8rom{capacity_kb(capacity_byte)}d{num_directory_entries}")
+    return capacity_kb(capacity_byte), format_code
+
+def extract(file, dir, format):
+    subprocess.run(['cpmcp', '-f', format, '-p', file, '0:*.*', dir])
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python decode_rom_header.py <binary_file>")
         sys.exit(1)
-
     binary_file = sys.argv[1]
-    decode_rom_header(binary_file)
+    print(f'ROM file {binary_file}')
+    capacity_kb, format_code = decode_rom_header(binary_file)
+    dir_name = str(Path(binary_file).with_suffix(''))
+    os.makedirs(dir_name, exist_ok=True)
+    print(f'Created directory {dir_name}')
+    if capacity_kb == 32:
+        print(f'Dealing with 32k ROM')
+        with open(binary_file, 'rb') as f:
+            buf = f.read()
+        assert(len(buf) == 32768)
+        with NamedTemporaryFile('wb', delete=False) as temp_file:
+            temp_file.write(buf[16384:])
+            temp_file.write(buf[:16384])
+        extract(temp_file.name, dir_name, format_code)
+    else:
+        temp_file = None
+        extract(binary_file, dir_name, format_code)
+    if temp_file:
+        os.remove(temp_file.name)
