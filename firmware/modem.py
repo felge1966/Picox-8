@@ -267,6 +267,8 @@ class Modem:
                 set_freq(tone_generator1, 425)
                 self.set_state(State.OFF_HOOK)
                 self.number_buffer = ''
+            if event == Event.UART_RX:
+                self.uart.write(arg)
         elif self.state == State.OFF_HOOK:
             if event == Event.DTMF:
                 self.number_buffer += arg
