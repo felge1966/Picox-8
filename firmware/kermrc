@@ -1,6 +1,0 @@
-set line /dev/ttyUSB0
-set spee 38400
-set flow none
-set carrier-watch off
-set terminal debug on
-connect
