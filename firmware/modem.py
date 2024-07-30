@@ -201,26 +201,18 @@ class Modem:
         cpld.write_reg(cpld.REG_MODEM_STATUS, self.status)
         set_freq(tone_generator1, 0)
         set_freq(tone_generator2, 0)
-        self.state = State.IDLE
+        self.state = None
+        self.set_state(State.IDLE)
         self.answer_mode = False
         self.old_modem_control = 0
+        self.old_baud_control = 0
         self.dtmf_digit = None
         self.number_buffer = ''
         self.tone_player = None
         self.command_processor = None
-        self.sync_baud()
         if self.socket:
             self.socket.close()
             self.socket = None
-
-    def sync_baud(self):
-        baud_control = cpld.read_reg(cpld.REG_BAUDRATE) & 0xf0
-        if baud_control in REG_TO_BAUD:
-            self.baud = REG_TO_BAUD[baud_control]
-        else:
-            print(f'Unrecognized UART baud rate register value {baud_control}')
-        print(f'UART baud rate: {self.baud}')
-        self.uart.init(self.baud, bits=8, parity=None, stop=1)
 
     def set_state(self, state):
         print("Modem", State.get_name(self.state), "->", State.get_name(state))
@@ -261,6 +253,20 @@ class Modem:
                 i += 1
         return return_data[:j]
 
+    def carrier_detected(self, on):
+        if on:
+            self.status = self.status & ~Status.CD
+        else:
+            self.status = self.status | Status.CD
+        cpld.write_reg(cpld.REG_MODEM_STATUS, self.status)
+
+    def ringing(self, on):
+        if on:
+            self.status = self.status & ~Status.RNG
+        else:
+            self.status = self.status | Status.RNG
+        cpld.write_reg(cpld.REG_MODEM_STATUS, self.status)
+
     def handle_event(self, event, arg):
         if self.state == State.IDLE:
             if event == Event.CONTROL_OHC and arg:
@@ -268,7 +274,9 @@ class Modem:
                 self.set_state(State.OFF_HOOK)
                 self.number_buffer = ''
             if event == Event.UART_RX:
-                self.uart.write(arg)
+                self.command_processor = CommandProcessor(self.uart)
+                self.set_state(State.COMMAND_MODE)
+                self.handle_event(event, arg)               # send char to command processor
         elif self.state == State.OFF_HOOK:
             if event == Event.DTMF:
                 self.number_buffer += arg
@@ -328,7 +336,6 @@ class Modem:
             if event == Event.TICK:
                 if not self.tone_player.tick():
                     return
-                self.sync_baud()
                 try:
                     self.socket.write(bytes([IAC, DO, SGA,
                                              IAC, DO, ECHO]))
@@ -359,7 +366,6 @@ class Modem:
             if event == Event.TICK:
                 if self.tone_player and self.tone_player.tick():
                     self.tone_player = None
-                    self.sync_baud()
                     self.command_processor = CommandProcessor(self.uart)
                     self.set_state(State.COMMAND_MODE)
         elif self.state == State.COMMAND_MODE:
@@ -392,6 +398,20 @@ class Modem:
         if (byte ^ self.old_modem_control) & Control.CCT:
             self.handle_event(Event.CONTROL_CCT, byte & Control.CCT)
 
+
+    def handle_baudrate(self):
+        baud_control = cpld.read_reg(cpld.REG_BAUDRATE) & 0xf0
+        if baud_control == self.old_baud_control:
+            return
+        self.old_baud_control = baud_control
+        if baud_control in REG_TO_BAUD:
+            self.baud = REG_TO_BAUD[baud_control]
+        else:
+            print(f'Unrecognized UART baud rate register value {baud_control}')
+        print(f'UART baud rate: {self.baud}')
+        self.uart.init(self.baud, bits=8, parity=None, stop=1)
+
+
     DTMF_LOW = [ 697, 770, 852, 941 ]
     DTMF_HIGH = [ 1209, 1336, 1477, 1633 ]
     DTMF_FREQ_MAP = {
@@ -407,20 +427,6 @@ class Modem:
         12: '*',
         13: '0'
     }
-
-    def carrier_detected(self, on):
-        if on:
-            self.status = self.status & ~Status.CD
-        else:
-            self.status = self.status | Status.CD
-        cpld.write_reg(cpld.REG_MODEM_STATUS, self.status)
-
-    def ringing(self, on):
-        if on:
-            self.status = self.status & ~Status.RNG
-        else:
-            self.status = self.status | Status.RNG
-        cpld.write_reg(cpld.REG_MODEM_STATUS, self.status)
 
     def handle_tone_dialer(self):
         byte = cpld.read_reg(cpld.REG_TONE_DIALER)

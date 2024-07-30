@@ -1,3 +1,6 @@
 import picox8
-print('polling irq lines')
-picox8.main_loop()
+while True:
+  try:
+    picox8.main_loop()
+  except KeyboardInterrupt:
+    break

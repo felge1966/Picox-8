@@ -58,22 +58,27 @@ architecture Behavioral of PicoX8 is
   constant PX8_RAMDISK_DATA     : std_logic_vector(7 downto 0) := x"80";
   constant PX8_RAMDISK_CONTROL  : std_logic_vector(7 downto 0) := x"81";
   constant PX8_BAUDRATE         : std_logic_vector(7 downto 0) := x"00";
+  constant PX8_CTLR2            : std_logic_vector(7 downto 0) := x"02";
   constant PICO_TONE_DIALER     : std_logic_vector(2 downto 0) := "000";
   constant PICO_MODEM_CONTROL   : std_logic_vector(2 downto 0) := "001";
   constant PICO_MODEM_STATUS    : std_logic_vector(2 downto 0) := "010";
   constant PICO_RAMDISK_DATA    : std_logic_vector(2 downto 0) := "011";
   constant PICO_RAMDISK_CONTROL : std_logic_vector(2 downto 0) := "100";
   constant PICO_BAUDRATE        : std_logic_vector(2 downto 0) := "101";
+  constant PICO_CTLR2           : std_logic_vector(2 downto 0) := "110";
   constant PICO_IRQ             : std_logic_vector(2 downto 0) := "111";
   signal irq_register           : std_logic_vector(7 downto 0);
   signal modem_tone_dialer      : std_logic_vector(7 downto 0);
   signal modem_control          : std_logic_vector(7 downto 0);
   signal modem_status           : std_logic_vector(7 downto 0);
   signal baudrate               : std_logic_vector(7 downto 0);
+  signal ctlr2                  : std_logic_vector(7 downto 0);
   signal ramdisk_data           : std_logic_vector(7 downto 0);
   signal ramdisk_command        : std_logic_vector(7 downto 0);
   signal irq_tone_dialer        : std_logic;
+  signal irq_baudrate           : std_logic;
   signal irq_modem_control      : std_logic;
+  signal irq_ctlr2              : std_logic;
   signal irq_ramdisk_command    : std_logic;
   signal irq_ramdisk_obf        : std_logic;
   signal irq_ramdisk_ibf        : std_logic;
@@ -93,12 +98,15 @@ begin
         modem_control       <= x"00";
         modem_status        <= x"00";
         baudrate            <= x"00";
+        ctlr2               <= x"00";
         ramdisk_data        <= x"00";
         ramdisk_command     <= x"00";
         irq_ramdisk_ibf     <= '0';
         irq_ramdisk_obf     <= '0';
         irq_tone_dialer     <= '0';
         irq_modem_control   <= '0';
+        irq_baudrate        <= '0';
+        irq_ctlr2           <= '0';
         irq_ramdisk_command <= '0';
       else
         led1_buf <= '1';
@@ -148,6 +156,10 @@ begin
                 irq_modem_control <= '1';
               when PX8_BAUDRATE =>
                 baudrate <= data;
+                irq_baudrate <= '1';
+              when PX8_CTLR2 =>
+                ctlr2 <= data;
+                irq_ctlr2 <= '1';
               when PX8_RAMDISK_DATA =>
                 ramdisk_data <= data;
                 irq_ramdisk_obf <= '1';
@@ -182,6 +194,10 @@ begin
                 irq_modem_control <= '0';
               when PICO_BAUDRATE =>
                 pico_data_out <= baudrate;
+                irq_baudrate <= '0';
+              when PICO_CTLR2 =>
+                pico_data_out <= ctlr2;
+                irq_ctlr2 <= '0';
               when PICO_RAMDISK_DATA =>
                 pico_data_out <= ramdisk_data;
                 irq_ramdisk_obf <= '0';
@@ -223,6 +239,8 @@ begin
                    2 => irq_ramdisk_command,
                    3 => irq_ramdisk_obf,
                    4 => irq_ramdisk_ibf,
+                   5 => irq_baudrate,
+                   6 => irq_ctlr2,
                    others => '0');
 
   led0 <= '0';

@@ -112,6 +112,12 @@ class RamDisk:
             self.read_count = 4
         elif self.command == Command.CKSUM:
             print("RAM-Disk CKSUM")
+            try:
+                storage.umount_sdcard()
+                storage.mount_sdcard()
+                self.reopen_file()
+            except Exception as e:
+                print(f'Error {e} remounting SD-Card')
             self.command = None
             cpld.write_reg(cpld.REG_RAMDISK_DATA, self.cksum)
         else:
@@ -127,9 +133,13 @@ class RamDisk:
         if self.command == Command.READ:
             offset = self.get_sector_offset()
             print("RAM-Disk READ", offset)
-            self.file.seek(offset)
-            cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                 # status OK
-            self.file.readinto(self.file_buffer)
+            try:
+                self.file.seek(offset)
+                self.file.readinto(self.file_buffer)
+                cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                 # status OK
+            except Exception as e:
+                print(f'Error {e} while reading')
+                cpld.write_reg(cpld.REG_RAMDISK_DATA, 255)                 # status failed
             for byte in self.file_buffer:
                 while True:
                     if not cpld.read_reg(cpld.REG_IRQ) & cpld.IRQ_RAMDISK_IBF:
@@ -138,9 +148,13 @@ class RamDisk:
         elif self.command == Command.READB:
             offset = self.get_byte_offset()
             print("RAM-Disk READB", offset)
-            self.file.seek(offset)
-            byte = self.file.read(1)
-            cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                 # status OK
+            try:
+                self.file.seek(offset)
+                byte = self.file.read(1)
+                cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                 # status OK
+            except Exception as e:
+                print(f'Error {e} while writing')
+                cpld.write_reg(cpld.REG_RAMDISK_DATA, 255)                 # status failed
             while True:
                 if not cpld.read_reg(cpld.REG_IRQ) & cpld.IRQ_RAMDISK_IBF:
                     break
