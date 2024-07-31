@@ -1,0 +1,3 @@
+[submodule "firmware/mrequests"]
+	path = firmware/mrequests
+	url = git@github.com:SpotlightKid/mrequests.git
