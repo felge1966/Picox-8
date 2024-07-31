@@ -11,7 +11,8 @@ modem = Modem()
 
 def main_loop():
     wifi.connect()
-    iterations = 0
+    ramdisk_iterations = 0
+    modem_disable_delay = 0
     modem_enabled = False
     while True:
         byte = cpld.read_reg(cpld.REG_IRQ)
@@ -29,16 +30,22 @@ def main_loop():
                 modem_enabled = new_modem_enabled
                 if modem_enabled:
                     print('Enable modem')
-                    modem.reset()
+                    modem_disable_delay = 0
                 else:
                     print('Disable modem')
+                    modem_disable_delay = 1000
+        if not modem_enabled and modem_disable_delay > 0:
+            modem_disable_delay -= 1
+            if modem_disable_delay == 0:
+                print('Resetting modem')
+                modem.reset()
         if byte & cpld.IRQ_RAMDISK_COMMAND:
             ramdisk.handle_command()
         if byte & cpld.IRQ_RAMDISK_OBF:
             ramdisk.handle_data()
-        iterations = iterations + 1
-        if iterations == 1000:
-            iterations = 0
+        ramdisk_iterations += 1
+        if ramdisk_iterations == 1000:
+            ramdisk_iterations = 0
             ramdisk.maybe_flush_pending_writes()
 
         modem.poll()
