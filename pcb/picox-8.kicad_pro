@@ -474,6 +474,18 @@
       {
         "netclass": "Power",
         "pattern": "+3.3V"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "*VSYS"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "*VBUS"
+      },
+      {
+        "netclass": "Default",
+        "pattern": "*VB1"
       }
     ]
   },

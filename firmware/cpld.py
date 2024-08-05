@@ -31,7 +31,7 @@ IRQ_RAMDISK_COMMAND = 0x04
 IRQ_RAMDISK_OBF     = 0x08
 IRQ_RAMDISK_IBF     = 0x10
 IRQ_BAUDRATE        = 0x20
-IRQ_CTLR2           = 0x40
+IRQ_MISC_CONTROL    = 0x40
 
 # Register numbers
 REG_TONE_DIALER     = 0
@@ -40,7 +40,7 @@ REG_MODEM_STATUS    = 2
 REG_RAMDISK_DATA    = 3
 REG_RAMDISK_CONTROL = 4
 REG_BAUDRATE        = 5
-REG_CTLR2           = 6
+REG_MISC_CONTROL    = 6
 REG_IRQ             = 7
 
 # PIO program to communicate to the CPLD

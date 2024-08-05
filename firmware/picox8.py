@@ -23,9 +23,10 @@ def main_loop():
                 modem.handle_control()
             if byte & cpld.IRQ_BAUDRATE:
                 modem.handle_baudrate()
-        if byte & cpld.IRQ_CTLR2:
-            ctlr2 = cpld.read_reg(cpld.REG_CTLR2)
-            new_modem_enabled = (ctlr2 & 0x20) == 0
+        if byte & cpld.IRQ_MISC_CONTROL:
+            # fixme: handle all control bits (ser handshake, buttons)
+            misc_control = cpld.read_reg(cpld.REG_MISC_CONTROL)
+            new_modem_enabled = (misc_control & 0x01) == 0
             if new_modem_enabled != modem_enabled:
                 modem_enabled = new_modem_enabled
                 if modem_enabled:
