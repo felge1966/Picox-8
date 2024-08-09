@@ -486,6 +486,10 @@
       {
         "netclass": "Default",
         "pattern": "*VB1"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "*VBAT"
       }
     ]
   },
