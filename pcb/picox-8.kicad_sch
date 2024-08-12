@@ -21566,7 +21566,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "MCP73871-2CC"
+		(property "Value" "MCP73871"
 			(at 79.6641 218.44 0)
 			(effects
 				(font
@@ -24799,7 +24799,7 @@
 				)
 			)
 		)
-		(property "Value" "Q_PMOS_DGS"
+		(property "Value" "DMG2305UX"
 			(at 222.25 241.3 90)
 			(effects
 				(font
@@ -30217,7 +30217,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "XC95144XL-TQ100"
+		(property "Value" "XC95144XL"
 			(at 188.8841 31.75 0)
 			(effects
 				(font
