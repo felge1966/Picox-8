@@ -32,7 +32,8 @@ def main_loop():
         if byte & cpld.IRQ_MISC_CONTROL:
             # fixme: handle all control bits (ser handshake, buttons)
             misc_control = cpld.read_reg(cpld.REG_MISC_CONTROL)
-            new_modem_enabled = (misc_control & 0x01) == 0
+            # new_modem_enabled = (misc_control & 0x01) == 0
+            new_modem_enabled = (misc_control & 0x20) == 0
             if new_modem_enabled != modem_enabled:
                 modem_enabled = new_modem_enabled
                 if modem_enabled:
