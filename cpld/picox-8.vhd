@@ -296,7 +296,17 @@ begin
   led3 <= not irq_ramdisk_ibf;
 
   -- Misc bus signals
-  hlta_n <= '1';
+  hlta_n  <= '1';
   intex_n <= '1';
+
+  -- Charger control
+  chg_te_n  <= '0'; -- enable safety timer
+  chg_ce    <= '1'; -- enable charging
+  chg_prog2 <= '1'; -- 500 mA load on USB port
+  chg_sel   <= '0'; -- USB compatible
+
+  -- Serial transceiver
+  ser_shdn_n <= '0'; -- shut down
+  ser_en_n   <= '1'; -- not enabled
 
 end Behavioral;
