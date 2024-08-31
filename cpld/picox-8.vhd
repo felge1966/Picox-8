@@ -20,11 +20,11 @@ entity PicoX8 is
   Port (
     -- PX-8 expansion bus
     clk          : in    std_logic;
-    ioreq_n      : in    std_logic;
+    iorq_n       : in    std_logic;
     rd_n         : in    std_logic;
     wr_n         : in    std_logic;
-    reset_n      : in    std_logic;
-    address      : in    std_logic_vector(7 downto 0);
+    rs_n         : in    std_logic;
+    address      : in    std_logic_vector(15 downto 0);
     data         : inout std_logic_vector(7 downto 0);
     dcas         : in    std_logic;
     dw           : in    std_logic;
@@ -107,7 +107,7 @@ architecture Behavioral of PicoX8 is
   constant PICO_BAUDRATE          : std_logic_vector(2 downto 0) := "101";
   constant PICO_MISC_CONTROL      : std_logic_vector(2 downto 0) := "110";
   constant PICO_IRQ               : std_logic_vector(2 downto 0) := "111";
-  constant SERIAL_CONTROL_DEFAULT : std_logic_vector(7 downto 0) := "00000011";
+  constant SERIAL_CONTROL_DEFAULT : std_logic_vector(7 downto 0) := "00000001";
   signal irq_register             : std_logic_vector(7 downto 0);
   signal modem_tone_dialer        : std_logic_vector(7 downto 0);
   signal modem_control            : std_logic_vector(7 downto 0);
@@ -136,7 +136,7 @@ begin
   process(clk)
   begin
     if falling_edge(clk) then
-      if (reset_n = '0') then
+      if (rs_n = '0') then
         modem_tone_dialer   <= x"00";
         modem_control       <= x"00";
         modem_status        <= x"00";
@@ -160,9 +160,9 @@ begin
         pico_oe <= '0';
 
         -- Handle access from the Z80 side
-        if (ioreq_n = '0') then
+        if (iorq_n = '0') then
           if (rd_n = '0') then
-            case address is
+            case address(7 downto 0) is
               when PX8_MODEM_STATUS =>
                 led1_buf <= '0';
                 data_out <= modem_status;
@@ -181,7 +181,7 @@ begin
                 null;
             end case;
           elsif (wr_n = '0') then
-            case address is
+            case address(7 downto 0) is
               when PX8_TONE_DIALER =>
                 modem_tone_dialer <= data;
                 irq_tone_dialer <= '1';
@@ -193,7 +193,7 @@ begin
                 irq_baudrate <= '1';
               when PX8_CTLR2 =>
                 -- Bit 5 in CTLR2 register switches external modem on and off
-                misc_control_buf(0) <= data(5)
+                misc_control_buf(0) <= data(5);
               when PX8_RAMDISK_DATA =>
                 ramdisk_data <= data;
                 irq_ramdisk_obf <= '1';
@@ -206,7 +206,7 @@ begin
                 null;
             end case;
           else
-            if misc_control_buf <> misc_control then
+            if (misc_control_buf /= misc_control) then
               misc_control <= misc_control_buf;
               irq_misc_control <= '1';
             end if;
@@ -284,8 +284,7 @@ begin
   ser_shdn_n <= serial_control(1);
 
   -- Buffered input bits
-  misc_control_buf(1) <= ser_hsin;
-  misc_control_buf(2) <= btn_failsafe;
+  misc_control_buf(1) <= btn_failsafe;
 
   pico_bootsel <= '1' when btn_failsafe = '0' and btn_reset = '0';
   pico_run <= btn_reset;
@@ -304,9 +303,5 @@ begin
   chg_ce    <= '1'; -- enable charging
   chg_prog2 <= '1'; -- 500 mA load on USB port
   chg_sel   <= '0'; -- USB compatible
-
-  -- Serial transceiver
-  ser_shdn_n <= '0'; -- shut down
-  ser_en_n   <= '1'; -- not enabled
 
 end Behavioral;
