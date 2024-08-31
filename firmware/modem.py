@@ -92,6 +92,7 @@ class State(Enum):
     COMMAND_MODE = 8
     CALL_FAILED = 9
     DRAIN_UART = 10
+    TELNET_MODE = 11
 
 class CallProgressTone:
     def __init__(self, tones, repeats=False):
@@ -207,8 +208,7 @@ class Modem:
                 self.set_state(State.OFF_HOOK)
                 self.number_buffer = ''
             if event == Event.UART_RX:
-                self.command_processor = CommandProcessor(self.uart)
-                self.set_state(State.COMMAND_MODE)
+                self.set_state(State.TELNET_MODE)
                 self.handle_event(event, arg)               # send char to command processor
         elif self.state == State.OFF_HOOK:
             if event == Event.DTMF:
