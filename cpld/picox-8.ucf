@@ -1,71 +1,103 @@
-# Clock signal
-
 # Address bus (8-bit)
-NET "address[0]"          LOC = "97";
-NET "address[1]"          LOC = "96";
-NET "address[2]"          LOC = "95";
-NET "address[3]"          LOC = "94";
-NET "address[4]"          LOC = "93";
-NET "address[5]"          LOC = "92";
-NET "address[6]"          LOC = "91";
-NET "address[7]"          LOC = "90";
+NET "address[0]"   LOC="77";
+NET "address[1]"   LOC="80";
+NET "address[10]"  LOC="71";
+NET "address[11]"  LOC="85";
+NET "address[12]"  LOC="86";
+NET "address[13]"  LOC="81";
+NET "address[14]"  LOC="82";
+NET "address[15]"  LOC="78";
+NET "address[2]"   LOC="79";
+NET "address[3]"   LOC="74";
+NET "address[4]"   LOC="76";
+NET "address[5]"   LOC="72";
+NET "address[6]"   LOC="73";
+NET "address[7]"   LOC="70";
+NET "address[8]"   LOC="68";
+NET "address[9]"   LOC="67";
 
 # Data bus (8-bit)
-NET "data[0]"             LOC = "89";
-NET "data[1]"             LOC = "87";
-NET "data[2]"             LOC = "86";
-NET "data[3]"             LOC = "85";
-NET "data[4]"             LOC = "82";
-NET "data[5]"             LOC = "81";
-NET "data[6]"             LOC = "80";
-NET "data[7]"             LOC = "79";
+NET "data[0]"      LOC="66";
+NET "data[1]"      LOC="65";
+NET "data[2]"      LOC="64";
+NET "data[3]"      LOC="63";
+NET "data[4]"      LOC="61";
+NET "data[5]"      LOC="60";
+NET "data[6]"      LOC="59";
+NET "data[7]"      LOC="58";
 
 # Z80 Control
-NET "clk"                 LOC = "22" | PERIOD = 408.16 ns HIGH 50%;  # Pico GP10
-NET "ioreq_n"             LOC = "78";
-NET "rd_n"                LOC = "77";
-NET "wr_n"                LOC = "76";
-NET "reset_n"             LOC = "73";
+NET "clk"          LOC="22" | PERIOD = 408.16 ns HIGH 50%;
+NET "iorq_n"       LOC="42";
+NET "rd_n"         LOC="49";
+NET "wr_n"         LOC="43";
+NET "rs_n"         LOC="50";
+NET "busak_n"      LOC="55";
+NET "busrq_n"      LOC="56";
+NET "hlta_n"       LOC="52";
+NET "intex_n"      LOC="39";
+
+# Serial port
+NET "rxd_n"        LOC="36";
+NET "txd_n"        LOC="35";
+NET "m1_n"         LOC="54";
+NET "mreq_n"       LOC="46";
+NET "wait_n"       LOC="53";
+
+# Other PX-8 bus signals
+NET "dcas"         LOC="41";
+NET "dw"           LOC="40";
+NET "off"          LOC="37";
+NET "bk2_n"        LOC="34";
 
 # Pico register access port
-NET "pico_data[0]"        LOC = "10"; # Pico GP2
-NET "pico_data[1]"        LOC = "11"; # Pico GP3
-NET "pico_data[2]"        LOC = "12"; # Pico GP4
-NET "pico_data[3]"        LOC = "13"; # Pico GP5
-NET "pico_data[4]"        LOC = "14"; # Pico GP6
-NET "pico_data[5]"        LOC = "15"; # Pico GP7
-NET "pico_data[6]"        LOC = "16"; # Pico GP8
-NET "pico_data[7]"        LOC = "17"; # Pico GP9
+NET "pico_data[0]" LOC="30"; # Pico GP2
+NET "pico_data[1]" LOC="29"; # Pico GP3
+NET "pico_data[2]" LOC="28"; # Pico GP4
+NET "pico_data[3]" LOC="25"; # Pico GP5
+NET "pico_data[4]" LOC="24"; # Pico GP6
+NET "pico_data[5]" LOC="20"; # Pico GP7
+NET "pico_data[6]" LOC="19"; # Pico GP8
+NET "pico_data[7]" LOC="18"; # Pico GP9
 
-NET "pico_dir"            LOC = "18"; # Pico GP11
-NET "pico_stb"            LOC = "23"; # Pico GP12
+NET "pico_clk"     LOC="17"; # Pico GP10
+NET "pico_dir"     LOC="16"; # Pico GP11
+NET "pico_stb"     LOC="15"; # Pico GP12
 
-NET "pico_addr[0]"        LOC = "30"; # Pico GP13
-NET "pico_addr[1]"        LOC = "32"; # Pico GP14
-NET "pico_addr[2]"        LOC = "33"; # Pico GP15
+NET "pico_addr[0]" LOC="14"; # Pico GP13
+NET "pico_addr[1]" LOC="13"; # Pico GP14
+NET "pico_addr[2]" LOC="12"; # Pico GP15
 
-# RX inverter
-NET "rx"                  LOC = "20";
-NET "rx_n"                LOC = "74";
+NET "pico_rxd0"    LOC="32";
+NET "pico_txd0"    LOC="33";
+
+NET "pico_bootsel" LOC="93";
+NET "pico_run"     LOC="94";
+
+# Serial transceiver control
+NET "ser_en_n"     LOC="9";
+NET "ser_shdn_n"   LOC="10";
+
+# Battery charger control
+NET "chg_ce"       LOC="3";
+NET "chg_prog2"    LOC="1";
+NET "chg_sel"      LOC="99";
+NET "chg_stat1"    LOC="95";
+NET "chg_stat2"    LOC="96";
+NET "chg_pg_n"     LOC="97";
+NET "chg_te_n"     LOC="2";
+
+# SD Card status bits
+NET "sd_cd"        LOC="89";
+NET "sd_wp"        LOC="87";
+
+# Buttons
+NET "btn_failsafe" LOC="90";
+NET "btn_reset"    LOC="91";
 
 # Debugging LEDs
-NET "led0"                LOC = "24";
-NET "led1"                LOC = "25";
-NET "led2"                LOC = "28";
-NET "led3"                LOC = "29";
+NET "led0"         LOC="4";
+NET "led1"         LOC="6";
+NET "led2"         LOC="7";
+NET "led3"         LOC="8";
 
-# Ramdisk Debug Port
-NET "rdd_d[0]" LOC = "56";
-NET "rdd_d[1]" LOC = "58";
-NET "rdd_d[2]" LOC = "60";
-NET "rdd_d[3]" LOC = "64";
-NET "rdd_d[4]" LOC = "66";
-NET "rdd_d[5]" LOC = "68";
-NET "rdd_d[6]" LOC = "70";
-NET "rdd_d[7]" LOC = "72";
-
-NET "rdd_rw" LOC = "54";
-NET "rdd_clk" LOC = "52";
-NET "rdd_cd" LOC = "43";
-
-NET "rdd_obf" LOC = "39";

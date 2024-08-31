@@ -1,3 +1,4 @@
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
@@ -25,15 +26,39 @@ entity PicoX8 is
     reset_n      : in    std_logic;
     address      : in    std_logic_vector(7 downto 0);
     data         : inout std_logic_vector(7 downto 0);
-    -- RS232 port (receiver needs inverter)
-    rs232_rx_out : out   std_logic;
-    rs232_rx_in  : in    std_logic;
-    rs232_tx_in  : in    std_logic;
-    rs232_tx_out : out   std_logic;
+    dcas         : in    std_logic;
+    dw           : in    std_logic;
+    off          : in    std_logic;
+    bk2_n        : in    std_logic;
+    busak_n      : in    std_logic;
+    busrq_n      : in    std_logic;
+    hlta_n       : out   std_logic;
+    intex_n      : out   std_logic;
+    m1_n         : in    std_logic;
+    mreq_n       : in    std_logic;
+    wait_n       : in    std_logic;
 
-    -- Serial transceiver control and handshake
-    ser_hsin     : in    std_logic;
-    ser_hsout    : out   std_logic;
+    -- PX-8 RS232 port (receiver needs inverter)
+    rxd_n        : out   std_logic;
+    txd_n        : in    std_logic;
+
+    -- On board peripherals
+
+    -- Battery charger
+    chg_stat1    : in    std_logic;
+    chg_stat2    : in    std_logic;
+    chg_pg_n     : in    std_logic;
+
+    chg_ce       : out   std_logic;
+    chg_prog2    : out   std_logic;
+    chg_sel      : out   std_logic;
+    chg_te_n     : out   std_logic;
+
+    -- SD Card status bits
+    sd_cd        : in    std_logic;
+    sd_wp        : in    std_logic;
+
+    -- Serial transceiver control
     ser_en_n     : out   std_logic;
     ser_shdn_n   : out   std_logic;
 
@@ -41,23 +66,21 @@ entity PicoX8 is
     btn_reset    : in    std_logic;
     btn_failsafe : in    std_logic;
 
+    -- Pico interface
+
     -- Pico reset & boot control
     pico_run     : out   std_logic;
     pico_bootsel : out   std_logic;
 
-    -- Pico interface
     -- Pico register access port
     pico_data    : inout std_logic_vector(7 downto 0);
     pico_addr    : in    std_logic_vector(2 downto 0);
-    pico_dir     : in    std_logic;
     pico_stb     : in    std_logic;
+    pico_dir     : in    std_logic;
+    pico_clk     : out   std_logic;
 
-    -- Ramdisk debug port
-    rdd_d        : out   std_logic_vector(7 downto 0);
-    rdd_rw       : out   std_logic;
-    rdd_clk      : out   std_logic;
-    rdd_cd       : out   std_logic;
-    rdd_obf      : out   std_logic;
+    pico_txd0    : in    std_logic;
+    pico_rxd0    : out   std_logic;
 
     -- LEDs for debugging
     led0         : out   std_logic;
@@ -84,7 +107,7 @@ architecture Behavioral of PicoX8 is
   constant PICO_BAUDRATE          : std_logic_vector(2 downto 0) := "101";
   constant PICO_MISC_CONTROL      : std_logic_vector(2 downto 0) := "110";
   constant PICO_IRQ               : std_logic_vector(2 downto 0) := "111";
-  constant SERIAL_CONTROL_DEFAULT : std_logic_vector(7 downto 0) := "00000110";
+  constant SERIAL_CONTROL_DEFAULT : std_logic_vector(7 downto 0) := "00000011";
   signal irq_register             : std_logic_vector(7 downto 0);
   signal modem_tone_dialer        : std_logic_vector(7 downto 0);
   signal modem_control            : std_logic_vector(7 downto 0);
@@ -136,10 +159,6 @@ begin
         oe <= '0';
         pico_oe <= '0';
 
-        rdd_clk <= '0';
-        rdd_cd <= '0';
-        rdd_rw <= '0';
-
         -- Handle access from the Z80 side
         if (ioreq_n = '0') then
           if (rd_n = '0') then
@@ -153,17 +172,11 @@ begin
                 irq_ramdisk_ibf <= '0';
                 oe <= '1';
 
-                rdd_d <= ramdisk_data;
-                rdd_clk <= '1';
-                rdd_cd <= '1';
               when PX8_RAMDISK_CONTROL =>
                 led2_buf <= '0';
                 data_out <= (0 => irq_ramdisk_ibf, 1 => irq_ramdisk_obf, others => '0');
                 oe <= '1';
 
-                rdd_d <= (0 => irq_ramdisk_ibf, 1 => irq_ramdisk_obf, others => '0');
-                rdd_clk <= '1';
-                rdd_cd <= '0';
               when others =>
                 null;
             end case;
@@ -185,18 +198,10 @@ begin
                 ramdisk_data <= data;
                 irq_ramdisk_obf <= '1';
 
-                rdd_d <= data;
-                rdd_clk <= '1';
-                rdd_cd <= '1';
-                rdd_rw <= '1';
               when PX8_RAMDISK_CONTROL =>
                 ramdisk_command <= data;
                 irq_ramdisk_command <= '1';
 
-                rdd_d <= data;
-                rdd_clk <= '1';
-                rdd_cd <= '0';
-                rdd_rw <= '1';
               when others =>
                 null;
             end case;
@@ -257,9 +262,11 @@ begin
 
   data <= data_out when oe = '1' else (others => 'Z');
   pico_data <= pico_data_out when pico_oe = '1' else (others => 'Z');
+  pico_clk <= clk;
 
   -- RS232 RX on expansion bus needs to be inverted
-  rx_n <= not rx;
+  rxd_n <= not pico_txd0;
+  pico_rxd0 <= txd_n;
 
   -- IRQ register
   irq_register <= (0 => irq_tone_dialer,
@@ -273,9 +280,8 @@ begin
 
   -- Serial control bits (all bits off by default, need to set /EN and /SHDN to
   -- enable, see SERIAL_CONTROL_DEFAULT)
-  ser_hsout  <= serial_control(0);
-  ser_en_n   <= serial_control(1);
-  ser_shdn_n <= serial_control(2);
+  ser_en_n   <= serial_control(0);
+  ser_shdn_n <= serial_control(1);
 
   -- Buffered input bits
   misc_control_buf(1) <= ser_hsin;
@@ -289,6 +295,8 @@ begin
   led2 <= not irq_ramdisk_obf;
   led3 <= not irq_ramdisk_ibf;
 
-  rdd_obf <= irq_ramdisk_obf;
+  -- Misc bus signals
+  hlta_n <= '1';
+  intex_n <= '1';
 
 end Behavioral;
