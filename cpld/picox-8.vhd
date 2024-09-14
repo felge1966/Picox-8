@@ -152,11 +152,14 @@ begin
         irq_baudrate        <= '0';
         irq_misc_control    <= '0';
         irq_ramdisk_command <= '0';
+        oe <= '0';
+        data_out <= (others => '0');
       else
         led1_buf <= '1';
         led2_buf <= '1';
         led3_buf <= '1';
         oe <= '0';
+        data_out <= (others => '0');
         pico_oe <= '0';
 
         -- Handle access from the Z80 side
@@ -205,11 +208,6 @@ begin
               when others =>
                 null;
             end case;
-          else
-            if (misc_control_buf /= misc_control) then
-              misc_control <= misc_control_buf;
-              irq_misc_control <= '1';
-            end if;
           end if;
         end if;
         -- Handle access from the Pico side
@@ -261,6 +259,7 @@ begin
   end process;
 
   data <= data_out when oe = '1' else (others => 'Z');
+
   pico_data <= pico_data_out when pico_oe = '1' else (others => 'Z');
   pico_clk <= clk;
 
