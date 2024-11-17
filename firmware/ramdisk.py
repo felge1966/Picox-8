@@ -2,6 +2,7 @@ import cpld
 import time
 import storage
 import json
+from machine import Pin
 
 instance = None
 
@@ -10,6 +11,8 @@ DEFAULT_FILE   = 'default-ramdisk.dsk'
 
 IMAGE_KB       = 120             # size of a ramdisk image
 FLUSH_INTERVAL = 15000           # how often to flush ramdisk to flash
+
+FAILSAFE_SWITCH = Pin(27, Pin.IN, Pin.PULL_UP)
 
 class Command:
     RESET = 0
@@ -44,6 +47,7 @@ class RamDisk:
         self.cksum = 0                                           # formatted
         self.pending_writes = False
         self.last_flush = time.ticks_ms()
+        self.read_only = False
         self.file = None
         self.read_config()
         self.reopen_file()
@@ -75,9 +79,15 @@ class RamDisk:
                 self.file.close()
             except OSError as e:
                 print(f'Error {e} closing file')
-        name = self.config['ramdisk']
-        self.file = open(storage.path(name), 'r+b')
-        print(f'RAM-Disk file {name} mounted')
+        if FAILSAFE_SWITCH.value() == 0:
+            path = '/ramdisk.dsk'
+            self.read_only = True
+            print(f'Failsafe mode, RAM-Disk in Read-only mode')
+        else:
+            path = storage.path(self.config['ramdisk'])
+            self.read_only = False
+        self.file = open(path, 'r+b')
+        print(f'RAM-Disk file {path} mounted')
 
     def valid_file(self, name):
         size = storage.file_size(name)
@@ -101,7 +111,11 @@ class RamDisk:
         if self.command == Command.RESET:
             print("RAM-Disk RESET")
             self.command = None
-            cpld.write_reg(cpld.REG_RAMDISK_DATA, 1)                  # 1 == 120K ram Disk
+            status = 1                            # 1 == 120K ram Disk
+            if FAILSAFE_SWITCH.value() == 0:
+                status |= 2                       # 2 == Write Protect
+            cpld.write_reg(cpld.REG_RAMDISK_DATA, status)
+            self.reopen_file()
         elif self.command == Command.READ:
             self.read_count = 2
         elif self.command == Command.READB:
@@ -154,24 +168,30 @@ class RamDisk:
                 cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                 # status OK
             except Exception as e:
                 print(f'Error {e} while writing')
-                cpld.write_reg(cpld.REG_RAMDISK_DATA, 255)                 # status failed
+                cpld.write_reg(cpld.REG_RAMDISK_DATA, 255)               # status failed
             while True:
                 if not cpld.read_reg(cpld.REG_IRQ) & cpld.IRQ_RAMDISK_IBF:
                     break
             cpld.write_reg(cpld.REG_RAMDISK_DATA, byte)
         elif self.command == Command.WRITE:
+            if self.read_only:
+                cpld.write_reg(cpld.REG_RAMDISK_DATA, 0x04)              # status write protected
+                return
             offset = self.get_sector_offset()
             print("RAM-Disk WRITE", offset)
             self.file.seek(offset)
             self.file.write(self.px8_buffer[2:130])
-            cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                 # status OK
+            cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                     # status OK
             self.pending_writes = True
         elif self.command == Command.WRITEB:
+            if self.read_only:
+                cpld.write_reg(cpld.REG_RAMDISK_DATA, 0x04)              # status write protected
+                return
             offset = self.get_byte_offset()
             print("RAM-Disk WRITEB", offset)
             self.file.seek(offset)
             self.file.write(self.px8_buffer[3])
-            cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                 # status OK
+            cpld.write_reg(cpld.REG_RAMDISK_DATA, 0)                     # status OK
             self.pending_writes = True
         else:
             print("don't know how to execute command", self.command)
@@ -190,7 +210,6 @@ class RamDisk:
     def flush_pending_writes(self):
         if self.pending_writes:
             print("RAM-Disk flushing writes")
-            self.reopen_file()
             self.pending_writes = False
 
     def maybe_flush_pending_writes(self):

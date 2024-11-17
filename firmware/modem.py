@@ -7,7 +7,9 @@ import errno
 from machine import Pin
 
 from command_processor import CommandProcessor
+from enum import Enum
 import wifi
+import telnet
 import config
 
 instance = None
@@ -42,28 +44,6 @@ def set_freq(sm, f):
     else:
         sm.restart()                                        # restart to set output to low if running
 
-
-REG_TO_BAUD = {
-    0: 110,
-    32: 300,
-    48: 600,
-    64: 1200,
-    80: 2400,
-    96: 4800,
-    112: 9600,
-    160: 19200,
-}
-
-
-class Enum():
-  @classmethod
-  def _create_name_mapping(cls):
-    return {value: name for name, value in cls.__dict__.items() if isinstance(value, int)}
-
-  @classmethod
-  def get_name(cls, value):
-      name_mapping = cls._create_name_mapping()
-      return name_mapping.get(value, "UNKNOWN")
 
 class Control(Enum):
   OHC = 0x01
@@ -112,6 +92,7 @@ class State(Enum):
     COMMAND_MODE = 8
     CALL_FAILED = 9
     DRAIN_UART = 10
+    TELNET_MODE = 11
 
 class CallProgressTone:
     def __init__(self, tones, repeats=False):
@@ -147,21 +128,6 @@ HANDSHAKE_ORIGINATE_TONE = CallProgressTone((980, CONNECT_DELAY))
 COMMAND_MODE_TONE = CallProgressTone((425, 240, 0, 240, 425, 240, 0, 3000))
 
 
-# telnet option negotiation
-
-# command codes
-IAC  = 255  # Interpret as Command
-DONT = 254
-DO   = 253
-WONT = 252
-WILL = 251
-
-# Telnet options
-ECHO = 1
-SGA  = 3
-
-
-
 class TonePlayer:
     def __init__(self, tone):
         self.tone = tone
@@ -184,13 +150,12 @@ class TonePlayer:
 
 
 class Modem:
-    def __init__(self):
+    def __init__(self, uart):
         global instance
         if instance:
             print('Warning: Modem instance already exists')
         instance = self
-        self.baud = 4800
-        self.uart = machine.UART(0, baudrate=self.baud, tx=machine.Pin(0), rx=machine.Pin(1))
+        self.uart = uart
         self.socket = None
         self.last_tick = time.ticks_ms()
         self.tick_count = 0
@@ -222,37 +187,6 @@ class Modem:
         self.tone_player = TonePlayer(tone)
         self.set_state(State.CALL_FAILED)
 
-    # telnet option negotiation only works for options that arrive within one chunk of received
-    # data (i.e. if they span multiple socket read()s, they won't be processed)
-    def process_telnet_options(self, data):
-        i = 0
-        count = len(data)
-        j = 0
-        return_data = bytearray(data)
-        while i < count:
-            if data[i] == IAC and (count - i) >= 3:
-                iac, cmd, opt = data[i:i+3]
-                if cmd == DO:
-                    print(f'telnet DO {opt}')
-                    self.socket.write(bytes([IAC, WILL if opt == SGA else WONT, opt]))
-                elif cmd == DONT:
-                    print(f'telnet DONT {opt}')
-                    self.socket.write(bytes([IAC, WONT, opt]))
-                elif cmd == WILL:
-                    print(f'telnet WILL {opt}')
-                    self.socket.write(bytes([IAC, DO if opt == SGA or opt == ECHO else DONT, opt]))
-                elif cmd == WONT:
-                    print(f'telnet WONT {opt}')
-                    self.socket.write(bytes([IAC, DONT, opt]))
-                else:
-                    print(f'Unrecognized telnet option {cmd} {opt}')
-                i += 3
-            else:
-                return_data[j] = data[i]
-                j += 1
-                i += 1
-        return return_data[:j]
-
     def carrier_detected(self, on):
         if on:
             self.status = self.status & ~Status.CD
@@ -274,8 +208,7 @@ class Modem:
                 self.set_state(State.OFF_HOOK)
                 self.number_buffer = ''
             if event == Event.UART_RX:
-                self.command_processor = CommandProcessor(self.uart)
-                self.set_state(State.COMMAND_MODE)
+                self.set_state(State.TELNET_MODE)
                 self.handle_event(event, arg)               # send char to command processor
         elif self.state == State.OFF_HOOK:
             if event == Event.DTMF:
@@ -337,8 +270,7 @@ class Modem:
                 if not self.tone_player.tick():
                     return
                 try:
-                    self.socket.write(bytes([IAC, DO, SGA,
-                                             IAC, DO, ECHO]))
+                    telnet.send_options(self.socket)
                 except:
                     pass                                    # ignore errors during telnet option negotiation
                 self.set_state(State.CONNECTED)
@@ -354,7 +286,7 @@ class Modem:
                 try:
                     data = self.socket.recv(128)
                     if data:
-                        data = self.process_telnet_options(data)
+                        data = telnet.process_options(self.socket, data)
                         self.uart.write(data)
                     else:
                         self.set_state(State.DRAIN_UART)
@@ -397,19 +329,6 @@ class Modem:
             self.handle_event(Event.CONTROL_PWR, byte & Control.PWR)
         if (byte ^ self.old_modem_control) & Control.CCT:
             self.handle_event(Event.CONTROL_CCT, byte & Control.CCT)
-
-
-    def handle_baudrate(self):
-        baud_control = cpld.read_reg(cpld.REG_BAUDRATE) & 0xf0
-        if baud_control == self.old_baud_control:
-            return
-        self.old_baud_control = baud_control
-        if baud_control in REG_TO_BAUD:
-            self.baud = REG_TO_BAUD[baud_control]
-        else:
-            print(f'Unrecognized UART baud rate register value {baud_control}')
-        print(f'UART baud rate: {self.baud}')
-        self.uart.init(self.baud, bits=8, parity=None, stop=1)
 
 
     DTMF_LOW = [ 697, 770, 852, 941 ]
